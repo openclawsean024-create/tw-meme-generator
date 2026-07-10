@@ -1,0 +1,10 @@
+node_modules
+.next
+.vercel
+.env*.local
+*.log
+.DS_Store
+coverage
+.vitest-cache
+dist
+out

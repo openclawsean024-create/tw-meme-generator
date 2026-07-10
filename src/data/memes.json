@@ -1,0 +1,257 @@
+[
+  {
+    "id": "dora-surprised",
+    "name": "哆啦 A 夢驚訝",
+    "imageUrl": "https://picsum.photos/seed/dora-surprised/600/600",
+    "type": "with_text",
+    "defaultText": "什麼?!",
+    "textRegions": [
+      { "id": "r1", "x": 50, "y": 50, "w": 300, "h": 80, "defaultText": "什麼?!" }
+    ],
+    "tags": ["經典", "表情誇張"]
+  },
+  {
+    "id": "laughing-cry",
+    "name": "笑死",
+    "imageUrl": "https://picsum.photos/seed/laughing-cry/600/600",
+    "type": "with_text",
+    "defaultText": "笑死",
+    "textRegions": [
+      { "id": "r1", "x": 100, "y": 380, "w": 400, "h": 120, "defaultText": "笑死" }
+    ],
+    "tags": ["表情誇張", "搞笑"]
+  },
+  {
+    "id": "meltdown",
+    "name": "崩潰",
+    "imageUrl": "https://picsum.photos/seed/meltdown/600/600",
+    "type": "with_text",
+    "defaultText": "崩潰",
+    "textRegions": [
+      { "id": "r1", "x": 80, "y": 420, "w": 440, "h": 100, "defaultText": "崩潰" }
+    ],
+    "tags": ["表情誇張", "心情"]
+  },
+  {
+    "id": "rickroll",
+    "name": "Rickroll",
+    "imageUrl": "https://picsum.photos/seed/rickroll/600/600",
+    "type": "with_text",
+    "defaultText": "Never Gonna Give You Up",
+    "textRegions": [
+      { "id": "r1", "x": 60, "y": 60, "w": 480, "h": 80, "defaultText": "Never Gonna Give You Up" }
+    ],
+    "tags": ["經典", "英文"]
+  },
+  {
+    "id": "normal-performance",
+    "name": "正常發揮",
+    "imageUrl": "https://picsum.photos/seed/normal-performance/600/600",
+    "type": "with_text",
+    "defaultText": "正常發揮",
+    "textRegions": [
+      { "id": "r1", "x": 100, "y": 450, "w": 400, "h": 90, "defaultText": "正常發揮" }
+    ],
+    "tags": ["諷刺", "嘲諷"]
+  },
+  {
+    "id": "grandma-better",
+    "name": "我阿嬤都比這強",
+    "imageUrl": "https://picsum.photos/seed/grandma/600/600",
+    "type": "with_text",
+    "defaultText": "我阿嬤都比這強",
+    "textRegions": [
+      { "id": "r1", "x": 40, "y": 60, "w": 520, "h": 80, "defaultText": "我阿嬤都比這強" }
+    ],
+    "tags": ["嘲諷", "嘴人"]
+  },
+  {
+    "id": "i-am-trash",
+    "name": "我就爛",
+    "imageUrl": "https://picsum.photos/seed/i-am-trash/600/600",
+    "type": "with_text",
+    "defaultText": "我就爛",
+    "textRegions": [
+      { "id": "r1", "x": 150, "y": 420, "w": 300, "h": 110, "defaultText": "我就爛" }
+    ],
+    "tags": ["自嘲", "心情"]
+  },
+  {
+    "id": "i-am-lazy",
+    "name": "我就懶",
+    "imageUrl": "https://picsum.photos/seed/i-am-lazy/600/600",
+    "type": "with_text",
+    "defaultText": "我就懶",
+    "textRegions": [
+      { "id": "r1", "x": 150, "y": 420, "w": 300, "h": 110, "defaultText": "我就懶" }
+    ],
+    "tags": ["自嘲", "心情"]
+  },
+  {
+    "id": "ouyang-nana",
+    "name": "歐陽娜娜",
+    "imageUrl": "https://picsum.photos/seed/ouyang-nana/600/600",
+    "type": "with_text",
+    "defaultText": "娜娜",
+    "textRegions": [
+      { "id": "r1", "x": 200, "y": 60, "w": 200, "h": 80, "defaultText": "娜娜" }
+    ],
+    "tags": ["明星", "可愛"]
+  },
+  {
+    "id": "pure-desire",
+    "name": "純欲戰士",
+    "imageUrl": "https://picsum.photos/seed/pure-desire/600/600",
+    "type": "with_text",
+    "defaultText": "純欲戰士",
+    "textRegions": [
+      { "id": "r1", "x": 100, "y": 60, "w": 400, "h": 80, "defaultText": "純欲戰士" }
+    ],
+    "tags": ["網路流行", "嘲諷"]
+  },
+  {
+    "id": "jojo-stand",
+    "name": "JoJo 立不倒",
+    "imageUrl": "https://picsum.photos/seed/jojo-stand/600/600",
+    "type": "with_text",
+    "defaultText": "だが 斷る",
+    "textRegions": [
+      { "id": "r1", "x": 50, "y": 60, "w": 500, "h": 80, "defaultText": "だが 斷る" }
+    ],
+    "tags": ["動漫", "經典"]
+  },
+  {
+    "id": "muscle-memory",
+    "name": "肌肉記憶",
+    "imageUrl": "https://picsum.photos/seed/muscle-memory/600/600",
+    "type": "with_text",
+    "defaultText": "肌肉記憶",
+    "textRegions": [
+      { "id": "r1", "x": 100, "y": 450, "w": 400, "h": 90, "defaultText": "肌肉記憶" }
+    ],
+    "tags": ["網路流行"]
+  },
+  {
+    "id": "chick-chick",
+    "name": "雞雞叫",
+    "imageUrl": "https://picsum.photos/seed/chick-chick/600/600",
+    "type": "with_text",
+    "defaultText": "雞雞叫",
+    "textRegions": [
+      { "id": "r1", "x": 150, "y": 420, "w": 300, "h": 110, "defaultText": "雞雞叫" }
+    ],
+    "tags": ["網路流行", "搞笑"]
+  },
+  {
+    "id": "that-man",
+    "name": "辣個男人",
+    "imageUrl": "https://picsum.photos/seed/that-man/600/600",
+    "type": "with_text",
+    "defaultText": "辣個男人",
+    "textRegions": [
+      { "id": "r1", "x": 100, "y": 60, "w": 400, "h": 80, "defaultText": "辣個男人" }
+    ],
+    "tags": ["鄉土劇", "經典"]
+  },
+  {
+    "id": "women-folk",
+    "name": "女人們",
+    "imageUrl": "https://picsum.photos/seed/women-folk/600/600",
+    "type": "with_text",
+    "defaultText": "女人們",
+    "textRegions": [
+      { "id": "r1", "x": 150, "y": 60, "w": 300, "h": 80, "defaultText": "女人們" }
+    ],
+    "tags": ["鄉土劇", "經典"]
+  },
+  {
+    "id": "kids-choose",
+    "name": "小孩子才選擇",
+    "imageUrl": "https://picsum.photos/seed/kids-choose/600/600",
+    "type": "with_text",
+    "defaultText": "小孩子才選擇 我全都要",
+    "textRegions": [
+      { "id": "r1", "x": 50, "y": 60, "w": 500, "h": 80, "defaultText": "小孩子才選擇" },
+      { "id": "r2", "x": 50, "y": 460, "w": 500, "h": 80, "defaultText": "我全都要" }
+    ],
+    "tags": ["網路流行", "選擇困難"]
+  },
+  {
+    "id": "sad-cat",
+    "name": "悲傷貓貓",
+    "imageUrl": "https://picsum.photos/seed/sad-cat/600/600",
+    "type": "without_text",
+    "textRegions": [],
+    "tags": ["模板", "動物"]
+  },
+  {
+    "id": "thinking-bubble",
+    "name": "思考泡泡",
+    "imageUrl": "https://picsum.photos/seed/thinking-bubble/600/600",
+    "type": "without_text",
+    "textRegions": [],
+    "tags": ["模板", "思考"]
+  },
+  {
+    "id": "blank-vista",
+    "name": "空白遠景",
+    "imageUrl": "https://picsum.photos/seed/blank-vista/600/600",
+    "type": "without_text",
+    "textRegions": [],
+    "tags": ["模板", "風景"]
+  },
+  {
+    "id": "speech-bubble",
+    "name": "對話氣泡",
+    "imageUrl": "https://picsum.photos/seed/speech-bubble/600/600",
+    "type": "without_text",
+    "textRegions": [],
+    "tags": ["模板", "對話"]
+  },
+  {
+    "id": "rage-comic",
+    "name": "Rage 臉",
+    "imageUrl": "https://picsum.photos/seed/rage-comic/600/600",
+    "type": "with_text",
+    "defaultText": "RAGE",
+    "textRegions": [
+      { "id": "r1", "x": 80, "y": 60, "w": 440, "h": 80, "defaultText": "RAGE" }
+    ],
+    "tags": ["英文", "表情誇張"]
+  },
+  {
+    "id": "thumbs-up-cat",
+    "name": "按讚貓",
+    "imageUrl": "https://picsum.photos/seed/thumbs-up-cat/600/600",
+    "type": "without_text",
+    "textRegions": [],
+    "tags": ["模板", "動物", "可愛"]
+  },
+  {
+    "id": "fire-blank",
+    "name": "火焰空白",
+    "imageUrl": "https://picsum.photos/seed/fire-blank/600/600",
+    "type": "without_text",
+    "textRegions": [],
+    "tags": ["模板", "火焰"]
+  },
+  {
+    "id": "shocked-pikachu",
+    "name": "震驚皮卡丘",
+    "imageUrl": "https://picsum.photos/seed/shocked-pikachu/600/600",
+    "type": "with_text",
+    "defaultText": "蛤?",
+    "textRegions": [
+      { "id": "r1", "x": 100, "y": 60, "w": 400, "h": 80, "defaultText": "蛤?" }
+    ],
+    "tags": ["經典", "表情誇張"]
+  },
+  {
+    "id": "fine-blank",
+    "name": "沒事空白圖",
+    "imageUrl": "https://picsum.photos/seed/fine-blank/600/600",
+    "type": "without_text",
+    "textRegions": [],
+    "tags": ["模板"]
+  }
+]
