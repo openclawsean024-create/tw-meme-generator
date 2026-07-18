@@ -1,448 +1,370 @@
-# 台灣梗圖製造器 — 規格計劃書 v2.2.1
+# 台灣梗圖製造器 — 規格計劃書 v2.2.2（sweet spot sharp rewrite）
 
-> 版本：v2.2.1｜更新日期：2026-07-19｜維護者：Sophia (CPO) for Sean
-> 對接技術：Alan (CTO)｜GitHub：https://github.com/openclawsean024-create/tw-meme-generator
-> Live：https://tw-meme-generator.vercel.app
-> Sweet Spot 體檢：5/10（investigate）→ 本版重寫為「**Pexels + Unsplash 商用圖庫 + 繁中梗圖模板 + Threads/IG 直出尺寸**」
-
----
-
-## 0. 本版重寫摘要 (v2.2.1)
-
-- Sweet spot 體檢發現原 v2.2.1 PRD 用 **Picsum 隨機圖源**（版權風險），退件風險高。
-- 重寫為**正版圖庫（Unsplash / Pexels）+ 繁中梗圖模板 + Threads/IG 尺寸一鍵輸出**。
-- 鎖定「Threads / IG 創作者、行銷小編、社群小編」三群付費用戶。
-- §15 貼出完整 sweet spot 5 問體檢與重寫理由。
+> **版本**：v2.2.2｜**更新日期**：2026-07-19｜**維護者**：Sophia (CPO) for Sean
+> **對接技術**：Alan (CTO)｜**對接 Repo**：[openclawsean024-create/tw-meme-generator](https://github.com/openclawsean024-create/tw-meme-generator)
+> **Live**：https://tw-meme-generator.vercel.app
+> **Sweet Spot**：6/10（**繁中唯一 Threads/IG 梗圖 + 商用圖庫 + 一鍵 9:16 直出**）→ 本版銳化
 
 ---
 
-## 1. 產品概述 (Product Overview)
+## 0. 本版重寫摘要 (v2.2.2)
 
-### 1.1 問題陳述 (Problem Statement)
+v2.2.1 已定位「正版圖庫 + 繁中模板 + 社群直出尺寸」。本版**三件銳化**：
 
-**Sweet spot 體檢結論（score = 5/10, investigate）**：原 v2.2.1 PRD 用 Picsum 隨機圖源（CC0 但無語意、版權聲明需查清）。
+1. **砍掉 Picsum**（版權風險）→ 100% **Pexels + Unsplash + Pixabay 商用圖庫**（CC0）
+2. **甜蜜點定位**：Threads / IG 繁中創作者（Reels / 短影音封面 + 限動）+ 行銷小編 + 社群小編 — 與 Imgflip（英文紅海）、Canva（通用）切割
+3. **新功能**：**梗文案 AI 生成（繁中 GPT-4o-mini）** + **排程發文（Threads / IG buffer API）**
 
-| 競品 | 用戶數 | 月費 | 繁中梗圖模板 |
-|---|---|---|---|
-| **Imgflip** | 30M+ | Free-$6 | ⚠️ 英文為主 |
-| **Kapwing** | 10M+ | Free-$16 | ⚠️ |
-| **Canva** | 200M+ | Free-$13 | ✅ 有繁中 |
-| **Figma + 素材網** | 4M+ | Free-$12 | ✅ |
-| **台灣梗圖產生器（小工具）** | 100K+ | Free | ⚠️ 功能簡單 |
-| **本產品 v1**（已上線）| 50-500 users | Free | ✅ |
+§15 貼出完整 sweet spot 5 問 + **最終商業化評分**：**69 / 100**（公式 = (9×0.3 + 6×0.7)×10）。
 
-**找到的甜蜜點（v2.2.1 修正版）**：台灣 30 萬社群小編 + 50 萬 Threads/IG 創作者，他們需要：
+---
 
-1. **正版圖庫**（不用擔心版權）：Unsplash / Pexels CC0
-2. **繁中梗圖模板**（非英文 meme 模板）
-3. **Threads / IG / LINE 社群一鍵尺寸**（1080×1080、1080×1350、1080×1920）
-4. **AI 自動生成文案**（繁中諧音梗、政治梗避雷）
+## 1. 產品概述
 
-> **本 PRD 重新定位為「Threads/IG 社群小編專用 — 正版圖 + 繁中梗圖模板 + 一鍵多尺寸輸出」**。
+### 1.1 問題陳述
 
-### 1.2 目標使用者 (User Personas)
+繁中 Threads / IG 創作者每天產 1-3 張圖，最大的痛點不是「做圖」（Canva / 廣告設計師都會），而是「**找到商用圖 + 配繁中梗文案 + 一鍵 9:16 / 1:1 直出**」——三件事拆成三個工具。
 
-| Persona | 規模 (TW) | 月預算 | 痛點 | 觸及管道 |
+| 現有方案 | 問題 |
+|---|---|
+| **Imgflip** | 30M+ users、英文梗為主、無繁中梗資料庫 |
+| **Canva** | 200M+ users、繁中支援好、但**自動梗文案無、無 Threads 1:1 直出** |
+| **Figma + 素材網** | 通用設計工具、非梗圖設計 |
+| **imgur + 自己剪** | 版權風險、無梗文化 |
+| **Threads 創作社群（盜圖）** | 版權 + 流量大但商用安全 |
+| **繁中 Threads/IG 梗圖 + 商用圖庫 + 9:16 直出** | **市場空白** |
+
+**甜蜜點（v2.2.2 銳化）**：**繁中唯一 Threads/IG「商用圖庫 + 繁中梗文案 AI + 一鍵 9:16 直出」一條龍工廠**。
+
+### 1.2 目標使用者
+
+| Persona | 規模 (台灣) | 月情境 | 痛點 | ARPU/年 |
 |---|---|---|---|---|
-| 📱 「小美」Threads 創作者 | ~50 萬 | NT$0-300 | 想做梗圖、版權怕 | Threads / Dcard |
-| 📲 「阿明」IG 限動小編 | ~30 萬 | NT$0-500 | 需要 9:16 圖 | IG 創作者圈 |
-| 💼 「王總」品牌行銷小編 | ~5 萬家公司 | NT$500-2K | 要發文、要梗圖 | 行銷社群 / 進修 |
-| 🎓 「志明」大學生社群 | ~20 萬 | NT$0 | 班級 / 系學會發文 | Dcard / 學校 |
+| 🧵 **小琪 Threads 創作者** | ~30,000 | 日 2 張 | 找圖 + 梗文案 + 尺寸 | NT$1,188 |
+| 📸 **阿德 IG 限動小編** | ~50,000 | 日 5 張 | 9:16 直出 + 商用安全 | NT$1,188 |
+| 💼 **Lisa 社群小編** | ~20,000 | 月 100 張 | 商用圖 + 模板 | **NT$3,588（團隊）** |
+| 🎓 **志明學生 / 文創** | ~100,000 | 月 5 張 | 免費偶爾付 | NT$0 → 廣告 |
+| 📰 **新聞小編** | ~2,000 | 日 5 張 | 時事梗 + 商用授權 | **NT$9,588** |
 
-**核心使用者 = 小美 + 阿明 + 王總**（共 ~85 萬潛在、TAM 換算月費 NT$99-499 → 市場規模 NT$8M-40M MRR）。
+**核心 TA = 小琪 + 阿德 + Lisa**（100,000 人，Threads / IG 創作者 6% 付費 × NT$1,188 = NT$7.1M/年 TAM；保守抓 NT$2M）。
 
-### 1.3 核心價值主張 (Value Proposition)
+### 1.3 核心價值主張
 
-> **「正版圖 + 繁中梗圖模板 + Threads/IG 一鍵多尺寸 — 30 秒產出可發布的梗圖。」**
+> **「繁中唯一 Threads / IG 梗圖工廠 — 商用圖 + AI 梗文案 + 9:16 直出，10 秒做完一張。」**
 
-| 替代方案 | 缺點 | 我們的差異 |
+| 替代 | 缺點 | 我們差異 |
 |---|---|---|
-| Imgflip | 英文梗圖為主、版權不清 | **繁中模板 + 正版圖庫** |
-| Canva | 學習曲線高、模板英文為主 | **繁中專屬 + 社群尺寸** |
-| Figma + Unsplash | 需懂設計 | **30 秒產出、不需設計背景** |
-| 台灣小工具 | 功能簡單、版權不清 | **正版 + AI 文案 + 多尺寸** |
+| Imgflip | 英文 + 通用尺寸 | **繁中 Threads 1:1 + Reels 9:16** |
+| Canva | 通用、無自動梗文案 | **繁中 GPT 梗文案 + 商用圖庫** |
+| Figma | 設計工具非梗圖 | **一鍵直出尺寸** |
+| 自己剪 | 版權風險、慢 | **CC0 商用 + 10 秒** |
 
-**單一差異化承諾**：**「Threads/IG 一鍵多尺寸 + 正版圖庫 + 30 秒出圖」**。
+### 1.4 商業目標
 
-### 1.4 商業目標 (KPIs / OKRs)
-
-| 時間 | 目標 | 量化指標 |
+| 時間 | 目標 | 指標 |
 |---|---|---|
-| M3 | 5,000 註冊、500 付費 | NT$50K MRR |
-| M6 | 30,000 註冊、3,000 付費 | NT$300K MRR |
-| M12 | 100,000 註冊、10,000 付費 | NT$1.5M MRR |
-| M18 | 台灣社群小編 5% 滲透 | NT$5M MRR + B2B |
+| M3 | 200 付費 + 10K 月訪 + 1K 免費用戶 | 100K MRR |
+| M6 | 800 付費 + **10 企業** | 500K MRR |
+| M12 | 3000 付費 + **40 企業** | **2M MRR** |
 
 **Unit Economics**：
-- 免費：每月 10 張、無浮水印、Unsplash 標準
-- 個人 NT$99/月：每月 100 張、AI 文案、無水印
-- 創作者 NT$299/月：每月 500 張、批次、品牌套件
-- 企業 NT$999/月：每月無限、團隊協作、API
-- LTV = NT$299 × 18 個月 = NT$5.4K，CAC = NT$500，**LTV/CAC = 11:1** ✅
+- 個人 NT$99/mo × 3,000 = NT$297K MRR
+- 團隊 NT$299/mo × 40 = NT$12K MRR
+- 企業 NT$799/mo × 40 = NT$32K MRR
+- 商用授權費 NT$999/次 × 60 = NT$60K MRR
+- 合計 NT$400K MRR（M12 保守）
 
-### 1.5 ⭐ Non-Goals (明確不做)
+### 1.5 ⭐ Non-Goals
 
-| 不做 | 理由 |
-|---|---|
-| ❌ **Picsum 隨機圖源** | 版權風險、退件原因 |
-| ❌ **AI 生成圖**（DALL·E / Midjourney）| 紅海 + 算力成本 + 與「梗圖」定位失焦 |
-| ❌ **影片剪輯** | 紅海（CapCut）+ 與圖片失焦 |
-| ❌ **完整設計工具**（Figma 級）| 紅海、Sean 無法負擔 |
-| ❌ **LINE Bot / 即時通訊整合** | 與「圖片製造」失焦 |
-| ❌ **中英文以外語言** | v1 only 繁中 |
-| ❌ **NFT / 加密梗圖** | 紅海 + 與小編失焦 |
-| ❌ **個人客製化接案** | 紅海（Tasker 出任務）|
+- ❌ **英文 / 日文 / 韓文梗素材**（v1 繁中 only，鎖 niche）
+- ❌ **影音剪輯 / Reels 編輯**（CapCut 紅海）
+- ❌ **短影音生成**（Sora / Veo 紅海）
+- ❌ **AI 圖像生成**（Midjourney / DALL-E 紅海）
+- ❌ **NFT / meme coin 推廣**（法規 + 偏投機）
+- ❌ **論壇 / 留言區**（Ptt/Dcard 紅海）
+- ❌ **轉址 / 短網址**（PicSee 紅海）
+- ❌ **Scheduling 進階**（Buffer / Later 紅海，僅做基本排程）
+- ❌ **GIF 梗圖**（Giphy 紅海）
 
 ---
 
 ## 2. 使用者場景與流程
 
-### 2.1 使用者流程圖
+### 2.1 流程圖
 
 ```
-[使用者] 進入 tw-meme-generator.vercel.app
-  ↓
-選擇「模板」或「從零開始」
-  ├─ A) 模板庫（200+ 繁中梗圖模板）
-  └─ B) 上傳自己的圖
-  ↓
-選擇圖片來源：
-  ├─ A) Unsplash / Pexels 搜尋（CC0 正版）
-  ├─ B) 上傳自己的圖
-  └─ C) AI 生成文字背景（v2）
-  ↓
-輸入文案（繁中、支援諧音梗）
-  ↓
-選擇平台尺寸：
-  ├─ Threads / IG 貼文：1080×1080
-  ├─ IG 限動 / Reels 封面：1080×1920
-  ├─ IG 輪播：1080×1350
-  └─ LINE 社群：1200×800
-  ↓
-按「生成」 → 30 秒產出
-  ↓
-下載 / 直接複製到剪貼簿 / 一鍵發到 Threads / IG（v2 API）
+進入首頁 (tw-meme-generator.vercel.app)
+   ↓
+選「梗主題」/ 搜 / AI 生成主題
+   ├─ 熱門：今日時事 / Threads 熱榜 / 梗詞庫
+   ├─ 搜：「確診」、「躺平」、「閃電」
+   └─ AI 生成主題：AI 依熱度建議 5 個
+   ↓
+選圖庫（商用 CC0）
+   ├─ Pexels / Unsplash / Pixabay 搜
+   └─ 圖建議：AI 配對（依梗主題）
+   ↓
+AI 產生 3 種繁中梗文案
+   ├─ 短版（一句話）
+   ├─ 中版（兩句）
+   └─ 長版（三句 punchline）
+   ↓
+編輯（字型 / 顏色 / 位置）
+   ↓
+預覽 3 種尺寸
+   ├─ Threads 1:1 (1080×1080)
+   ├─ IG Reels 9:16 (1080×1920)
+   └─ IG 限動 9:16
+   ↓
+下載（PNG / JPG）或
+   ├─ 排程（Threads buffer API）
+   └─ 複製到 IG（手動）
 ```
 
 ### 2.2 關鍵用戶故事
 
 ```
-US-1（核心 - 社群小編）
-As a Threads 創作者「小美」
-I want 30 秒做出「上班想睡」梗圖
-So that 我可以每天發文不用想梗
+US-1（核心場景）
+As a Threads 創作者「小琪」
+I want AI 自動配圖 + 繁中梗文案 + 1:1 直出
+So that 我日 5 張產文從 30 分 → 5 分
 
-US-2（多尺寸一鍵）
-As a IG 小編「阿明」
-I want 一張圖自動出 4 種尺寸（IG、Threads、LINE）
-So that 我不必改 4 次
+US-2（IG 限動）
+As a IG 限動小編「阿德」
+I want 一鍵 9:16 直出 + 商用圖庫
+So that 我不出 1 張侵權圖
 
-US-3（AI 文案）
-As a 行銷小編「王總」
-I want AI 幫我想文案（「週一不想上班」「週五狂歡」）
-So that 我不必每天想梗
+US-3（**企業商用授權** - 核心付費）
+As a 品牌社群小編「Lisa」
+I want 商用授權 + 品牌字型 + 排程
+So that 月省 20hr 設計 + 0 侵權風險
 
-US-4（品牌套件）
-As a 品牌小編
-I want 上傳 Logo + 品牌色
-So that 所有梗圖自動套品牌風格（v2）
+US-4（AI 文案）
+As a 小琪
+I want AI 幫我寫 3 種 punchline 候選
+So that 我不必想梗
 
-US-5（批次發文）
-As a 社群小編
-I want 批次生成 30 張月發文圖
-So that 我不必每天做（v2）
+US-5（時事梗）
+As a 新聞小編
+I want 即時時事熱詞主題
+So that 趕上時事熱度
 ```
 
-### 2.3 邊界場景 (Edge Cases)
+### 2.3 邊界場景
 
 | 場景 | 處理 |
 |---|---|
-| Unsplash API 達 rate limit | 切換 Pexels / Pexels 是備援 |
-| 使用者上傳含個資圖片 | 警告 + ToS「請勿上傳他人個資」|
-| AI 文案產生不雅用語 | 過濾禁用詞 + 人工 review 機制 |
-| 政治敏感梗圖 | 預設過濾 + 明確標示「非政治」 |
-| 模板版權爭議 | 模板全部原創或 CC0、可商用 |
-| Threads / IG API 故障 | 降級為下載圖片、手動上傳 |
+| Pexels / Unsplash API 掛 | 切 Pixabay + 顯示「圖庫維護中」 |
+| AI 文案辱罵 / 歧視 | OpenAI moderation + 重新生成 |
+| 字型缺 | fallback 系統字 |
+| 圖解析度不足 | 提示「圖小於 800px」 |
+| 商用不明圖 | 強制 CC0 標籤，不可商用則擋下載 |
+| Threads buffer 失敗 | 失敗重試 + email 通知 |
 
 ---
 
-## 3. 功能性需求 (Functional Requirements)
+## 3. 功能性需求
 
-### 3.1 MVP（必做，P0）— **本版聚焦 5 features**
+### 3.1 MVP（P0）
 
-| ID | 功能 | 說明 | 為何必做 |
+| ID | 功能 | 狀態 | 為何必做 |
 |---|---|---|---|
-| F-001 | **200+ 繁中梗圖模板** | 原創 / CC0 | 核心 |
-| F-002 | **Unsplash / Pexels 圖庫搜尋** | CC0 正版 | 取代 Picsum |
-| F-003 | **AI 文案助理**（GPT-4o mini）| 自動生成繁中諧音 | 差異化 |
-| F-004 | **多尺寸輸出**（4 種社群）| Threads / IG / LINE | 甜蜜點 |
-| F-005 | **浮水印 / 無水印切換** | 免費版有水印、付費無 | 變現 |
+| F-001 | 圖庫搜尋（Pexels + Unsplash + Pixabay）| ❌ | 甜蜜點核心 |
+| F-002 | 繁中梗詞庫（300+ 詞）| ❌ | 差異化 |
+| F-003 | 熱門主題（今日 / Threads / 時事）| ❌ | 流量入口 |
+| F-004 | **AI 梗文案生成（GPT-4o-mini）**| ❌ | **甜蜜點核心** |
+| F-005 | 編輯器（字型 / 顏色 / 位置）| ❌ | 必要 |
+| F-006 | **一鍵 3 種尺寸（1:1 / 9:16 / 4:5）**| ❌ | **甜蜜點核心** |
+| F-007 | 下載（PNG / JPG）| ❌ | 必要 |
+| F-008 | 用戶帳號 + 我的作品 | ❌ | 留存 |
+| F-009 | **商用授權聲明（CC0 + 來源顯示）**| ❌ | **法律安全** |
 
-**砍掉 v1 不做的功能**：
-- ~~Picsum 隨機圖源~~
-- ~~AI 生成圖（DALL·E）~~
-- ~~影片剪輯~~
-- ~~LINE Bot / 訊息整合~~
-- ~~NFT / 加密梗圖~~
+**砍掉**：Picsum 隨機、AI 圖像生成、影音剪輯、英文素材。
 
-### 3.2 v2（加值，P1）
+### 3.2 v2（P1）
 
 | ID | 功能 | 商業理由 |
 |---|---|---|
-| F-101 | **Threads / IG 直接發文 API** | 一鍵發文 |
-| F-102 | **品牌套件**（Logo / 色票 / 字型）| B2B 必要 |
-| F-103 | **批次生成 + 排程** | 30 張月圖預排 |
-| F-104 | **模板市集**（使用者原創模板）| 社群 + 抽成 |
-| F-105 | **AI 圖文生成**（DALL·E 3）| 客製背景 |
+| F-101 | **Threads 排程（buffer API）** | 創作者出口 |
+| F-102 | **品牌字型 + Logo 上傳** | 企業 |
+| F-103 | **多帳號管理（團隊）** | NT$299 升級 |
+| F-104 | 商用授權書 PDF | 企業採購 |
+| F-105 | **GIF 梗製作（Giphy 整合）** | 紅海 but v2 仍做（一鍵輸出） |
+| F-106 | IG 排程（IG Graph API） | 企業 |
 
-### 3.3 v3（探索，P2）
+### 3.3 v3（P2 探索）
 
-| ID | 功能 | 假設驗證 |
+| ID | 功能 | 假設 |
 |---|---|---|
-| F-201 | **AI 自動生成完整貼文** | Threads / IG 文案 + 圖 |
-| F-202 | **社群小編助手 LINE Bot** | 跨平台 |
-| F-203 | **多帳號管理**（代操）| 代理商需求 |
-| F-204 | **API 開放** | 企業整合 CRM |
+| F-201 | Threads / IG 自動發文 | 流量出口 |
+| F-202 | 短影片模板 | 紅海慎入 |
+| F-203 | 馬來西亞 / 新加坡繁中 | 國際化 |
+| F-204 | 梗文 AI 學習個人生成 | 個人化 |
 
-### 3.4 ⭐ Acceptance Criteria (Given/When/Then)
+### 3.4 ⭐ Acceptance Criteria
 
-```gherkin
-AC-01: 模板選擇
-  Given 使用者進入首頁
-  When 選擇「模板庫」
-  Then 看到 200+ 繁中梗圖模板（依分類：上班 / 學校 / 戀愛 / 迷因）
-  And 點擊模板可預覽
+```
+AC-01 圖庫搜尋
+  Given 用戶搜「閃電」
+  When 點搜尋
+  Then 5 秒內顯示 20 張結果（Pexels + Unsplash + Pixabay）
+  And 每張標「商用 CC0 + 來源」
+  And 點大圖預覽
 
-AC-02: 正版圖庫搜尋
-  Given 使用者選擇「從零開始」
-  When 在搜尋框輸入「貓」
-  Then 顯示 Unsplash + Pexels 結果（CC0 標示）
-  And 可選擇 1 張作為背景
+AC-02 AI 文案生成
+  Given 用戶選圖 + 梗主題「確診」
+  When 點「AI 生文案」
+  Then 10 秒內出 3 種（中/短/長）
+  And 每句含關鍵字主題詞
+  And 不含辱罵 / 歧義（moderation 過）
 
-AC-03: AI 文案生成（核心）
-  Given 使用者已選擇模板
-  When 在文案框輸入「主題：週一不想上班」
-  And 點擊「AI 生成」
-  Then 10 秒內產生 3 個繁中諧音梗文案
-  And 可選擇 1 個套用
+AC-03 一鍵多尺寸
+  Given 用戶編輯完成原圖
+  When 點「下載 3 尺寸」
+  Then < 5 秒出 3 張 PNG（1:1 + 9:16 + 4:5）
+  And 字型位置自動調整
+  And ≤ 2MB / 張
 
-AC-04: 多尺寸輸出
-  Given 使用者已編輯梗圖
-  When 點擊「下載」
-  Then 看到 4 種尺寸選項（IG 1080×1080、限動 1080×1920、Threads 1080×1080、LINE 1200×800）
-  And 一鍵批次下載 4 個尺寸
+AC-04 商用授權
+  Given 圖庫標 non-CC0
+  When 嘗試下載
+  Then 強制顯示「不可商用」警告
+  And 鎖下載按鈕
+  And 推薦 CC0 替代
 
-AC-05: 浮水印機制
-  Given 免費用戶
-  When 下載圖片
-  Then 圖片右下角浮水印「tw-meme-generator」
-  And 付費用戶無水印
-
-AC-06: 配額警告
-  Given 個人 NT$99 訂閱、本月已用 80 張
-  When 再生成 1 張
-  Then 顯示「⚠️ 額度剩 20 張」提醒
-
-AC-07: Threads 直接發文（v2）
-  Given 進階會員已綁定 Threads 帳號
-  When 點擊「發到 Threads」
-  Then OAuth 授權 → 自動發文
-  And 不需離開本工具
-
-AC-08: 品牌套件（v2）
-  Given 企業會員上傳 Logo + 品牌色
-  When 進入編輯器
-  Then 所有模板自動套品牌色 + Logo 浮水印
-  And 可儲存為「品牌模板」
-
-AC-09: 模板市集（v2）
-  Given 創作者發布 1 個原創模板
-  When 其他使用者下載該模板
-  Then 創作者獲 NT$5 / 次（從平台抽成中扣除）
-  And 月結算收益
-
-AC-10: 政治敏感過濾
-  Given 使用者輸入含政治關鍵字
-  When 嘗試生成
-  Then 顯示「⚠️ 本工具不支援政治內容」
-  And 自動過濾不輸出
+AC-05 **Threads 排程（v2.2.2 新）**
+  Given Pro 用戶已授權 Threads
+  When 選排程時間 + 內容
+  Then 自動排入 buffer queue
+  And 5 分鐘前 e2e 測試成功發文
 ```
 
 ---
 
-## 4. 系統設計 (System Design)
+## 4. 系統設計
 
-### 4.1 技術棧 (Tech Stack)
+### 4.1 技術棧
 
-| 層 | 技術 | 理由 |
+| Layer | 選 | 理由 |
 |---|---|---|
-| Frontend | Next.js 16 + Tailwind 4 + Fabric.js | 既有 stack + 圖片編輯器 |
-| 圖片搜尋 | Unsplash API + Pexels API | CC0 正版 |
-| AI 文案 | OpenAI gpt-4o-mini | $0.15/M tokens |
-| AI 圖（v2）| OpenAI DALL·E 3 | $0.04/張 |
-| 圖片編輯 | Fabric.js + Konva.js | Canvas 編輯 |
-| 模板管理 | Cloudflare R2 + Supabase | 圖片 CDN |
-| Threads / IG API | Meta Graph API | 官方 |
-| 部署 | Vercel | 零月費 |
+| Frontend | Next.js 16 + Tailwind | 既有 |
+| Canvas | **Fabric.js v6** | 既有 / 文字編輯主流 |
+| Image | Cloudflare Images（resize） | 國際 + 速度快 |
+| AI | **GPT-4o-mini**（繁中 prompt）| 成本低 |
+| 圖庫 | Pexels + Unsplash + Pixabay API | CC0 商用 |
+| DB | Vercel Postgres | 既有 |
+| Auth | Clerk / NextAuth | 既有 |
+| Payment | NewebPay | 在地化 |
+| Scheduling | **Buffer API（Threads）**| v2 |
 
-### 4.2 系統架構圖
+### 4.2 架構
 
-```mermaid
-graph TB
-  subgraph User [使用者]
-    UI[Web App]
-    EDIT[Canvas 編輯器]
-    AI[AI 文案對話]
-  end
-
-  subgraph Backend
-    API[API Routes]
-    CRON[排程發文]
-  end
-
-  subgraph 圖庫
-    UNSPLASH[Unsplash API]
-    PEXELS[Pexels API]
-    R2[(Cloudflare R2 - 模板)]
-  end
-
-  subgraph AI
-    GPT[GPT-4o mini]
-    DALLE[DALL·E 3]
-  end
-
-  subgraph 社群
-    META[Meta Graph API - Threads/IG]
-  end
-
-  UI --> EDIT
-  UI --> AI
-  UI --> API
-  API --> UNSPLASH
-  API --> PEXELS
-  API --> R2
-  AI --> GPT
-  EDIT --> DALLE
-  UI -->|發文| META
-  CRON -->|排程| META
+```
+[Browser]
+   ├─ /（熱門主題 + AI 推薦）
+   ├─ /editor（Fabric.js + AI 文案）
+   ├─ /my（作品集）
+   └─ /admin（管理）
+   ↓
+[Next.js API]
+   ├─ /api/image/search（Pexels/Unsplash/Pixabay 聚合）
+   ├─ /api/ai/caption（GPT-4o-mini）
+   ├─ /api/image/export（3 尺寸 zip）
+   └─ /api/schedule/threads（buffer）
+   ↓
+[Cloudflare Images]
+   └─ resize + format conversion
+   ↓
+[Vercel Postgres]
+   ├─ memes（用戶作品）
+   ├─ users（tier）
+   └─ templates（繁中梗詞庫）
 ```
 
-### 4.3 資料模型
+### 4.3 Prisma Schema
 
-```sql
--- 模板
-create table templates (
-  id uuid primary key default gen_random_uuid(),
-  name text not null,
-  category text check (category in ('work', 'school', 'love', 'meme', 'food', 'tech')),
-  image_url text not null,
-  svg_data text, -- 可編輯 SVG
-  is_official boolean default true,
-  is_paid boolean default false,
-  creator_id uuid references auth.users,
-  usage_count int default 0,
-  created_at timestamptz default now()
-);
+```prisma
+model Meme {
+  id          String   @id @default(cuid())
+  userId      String
+  title       String
+  topic       String   // 梗主題
+  caption     String   // AI 文案
+  imageUrl    String   // Cloudflare URL
+  sizesJson   String   // {1:1, 9:16, 4:5}
+  isPublic    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
 
--- 作品（使用者製作的梗圖）
-create table memes (
-  id uuid primary key default gen_random_uuid(),
-  user_id uuid references auth.users not null,
-  template_id uuid references templates,
-  image_data jsonb, -- {layers: [...], text: [...]}
-  final_image_url text, -- 輸出 URL
-  platform text check (platform in ('threads', 'ig_feed', 'ig_story', 'line')),
-  created_at timestamptz default now()
-);
+model Template {
+  id          String   @id @default(cuid())
+  topic       String   // 確診 / 躺平
+  hotScore    Int      @default(0)
+  captionHint String   // AI prompt 範本
+  tags        String   // JSON array
+  createdAt   DateTime @default(now())
+}
 
--- 排程（v2）
-create table scheduled_posts (
-  id uuid primary key default gen_random_uuid(),
-  user_id uuid references auth.users not null,
-  meme_id uuid references memes,
-  platform text,
-  scheduled_at timestamptz not null,
-  status text default 'pending' check (status in ('pending', 'posted', 'failed')),
-  posted_at timestamptz,
-  created_at timestamptz default now()
-);
-
--- 使用者配額
-create table user_quotas (
-  user_id uuid references auth.users primary key,
-  plan text default 'free' check (plan in ('free', 'personal', 'creator', 'business')),
-  monthly_memes_used int default 0,
-  monthly_memes_limit int default 10,
-  reset_at timestamptz
-);
+model Usage {
+  id        String   @id @default(cuid())
+  userId    String
+  feature   String   // search / ai / export
+  count     Int      @default(1)
+  createdAt DateTime @default(now())
+}
 ```
 
-### 4.4 API 規格
+### 4.4 API
 
-| Endpoint | Method | 用途 |
+| Method | Path | 用途 |
 |---|---|---|
-| `/api/templates` | GET | 模板列表 |
-| `/api/image-search` | GET | Unsplash / Pexels 搜尋 |
-| `/api/ai/caption` | POST | AI 文案生成 |
-| `/api/meme` | POST | 儲存作品 |
-| `/api/meme/export` | POST | 多尺寸匯出 |
-| `/api/scheduled` | POST | 排程發文（v2）|
-| `/api/billing/checkout` | POST | 訂閱升級 |
-| `/api/oauth/threads` | GET | Threads OAuth 串接（v2）|
+| GET | `/api/image/search?q=` | 圖庫聚合搜（Pexels+Unsplash+Pixabay）|
+| POST | `/api/ai/caption` | 3 種繁中梗文案 |
+| POST | `/api/meme` | 儲存作品 |
+| GET | `/api/meme/me` | 我的作品 |
+| POST | `/api/export` | 3 尺寸 PNG zip |
+| POST | `/api/schedule/threads` | Threads 排程（buffer）|
+| GET | `/api/templates/hot` | 熱門模板 |
 
 ---
 
-## 5. 非功能性需求 (Non-Functional Requirements)
+## 5. 非功能性需求
 
-### 5.1 性能指標
+### 5.1 性能
+- 圖庫搜 5 秒內出結果（cache）
+- AI 文案 < 10 秒
+- Canvas 編輯 60fps
+- 3 尺寸 zip < 5 秒
 
-| 指標 | 目標 |
-|---|---|
-| 模板載入 | < 2 秒 |
-| AI 文案生成 | < 10 秒 |
-| 多尺寸匯出（4 張）| < 5 秒 |
-| 圖片搜尋（Unsplash）| < 3 秒 |
-| 並行使用者 | 500 同時編輯 |
-
-### 5.2 安全與隱私
-
-| 項目 | 措施 |
-|---|---|
-| 使用者作品 | 預設私密、可選公開 |
-| 上傳圖片 | ToS 禁止含他人個資 |
-| 圖庫授權 | 全部 CC0 / Unsplash License |
-| Threads / IG OAuth token | 加密儲存、可隨時撤銷 |
-| 政治過濾 | 預設過濾、可關閉（企業版）|
+### 5.2 安全與法律
+- **強制 CC0**：所有商用圖庫標 CC0，明示來源
+- 圖庫非商用擋下載（避免侵權）
+- AI 文案 OpenAI moderation 過濾辱罵 / 歧視 / 色情
+- 用戶作品加密儲存（Cloudflare signed URL）
 
 ### 5.3 ⭐ 降級機制
 
 | 故障 | 降級 |
 |---|---|
-| Unsplash 掛了 | 切換 Pexels |
-| Pexels 掛了 | 切換自製模板庫（200+ 預載）|
-| GPT-4o mini 掛了 | 改用「預設文案範本」（50 種）|
-| Threads API 掛了 | 降級為「複製圖片 + 文案」手動發 |
-| Fabric.js Canvas 失敗 | 切換 Konva.js |
+| Pexels 掛 | 切 Unsplash + Pixabay |
+| GPT-4o-mini 掛 | 切 Qwen2.5（繁中開源）|
+| Cloudflare Images 掛 | 改 Vercel Image |
+| Buffer API 掛 | 改 email 通知 + 手動 |
+| NewebPay 掛 | 銀行轉帳 |
 
 ### 5.4 擴展性
-
-- **多語言**：v3 加英文 / 日文
-- **多平台**：v3 加小紅書 / 微博
-- **企業版**：API + SSO
+- 圖庫結果 Redis cache 24hr
+- 模板熱度每小時更新（cron）
 
 ---
 
-## 6. 完成標準 (Definition of Done)
+## 6. 完成標準 (DoD)
 
-### 6.1 v2 MVP DoD
-
-- [ ] 200+ 繁中梗圖模板（全部 CC0 / 原創）
-- [ ] Unsplash + Pexels 圖庫搜尋整合
-- [ ] AI 繁中文案生成（GPT-4o mini）
-- [ ] 4 種社群尺寸一鍵輸出
-- [ ] 浮水印機制（免費有、付費無）
-- [ ] 5,000 註冊、500 付費
-- [ ] Notion `狀態` = 已上線
+- [ ] F-001~F-009 全實作
+- [ ] 5 個 Threads / IG 創作者 beta
+- [ ] CC0 商用聲明頁 / Privacy
+- [ ] Lighthouse Performance ≥ 90
+- [ ] Notion PRD ≥ 9、商業化更新
 
 ---
 
@@ -450,330 +372,262 @@ create table user_quotas (
 
 ### 7.1 風險表
 
-| ID | 風險 | 等級 | 緩解 |
-|---|---|---|---|
-| R-01 | 模板版權爭議（看似原創其實抄）| 🟠 | 全部原創 + CC0 + 律師 review |
-| R-02 | Unsplash / Pexels API 漲價 | 🟠 | 雙來源 + 自製模板庫 |
-| R-03 | Threads / IG API 限制 | 🟠 | 已 ToS 標示 + 預期降級 |
-| R-04 | AI 文案品質差 | 🟠 | Few-shot prompting + 人工範本 |
-| R-05 | 政治敏感內容 | 🔴 | 預設過濾 + 監控 |
-| R-06 | Canva 進入繁中梗圖 | 🟡 | 我們先搶市場 + 在地化 |
-| R-07 | 小編付費意願低 | 🔴 | M3 驗證 PMF |
-| R-08 | Threads API 政策變動 | 🟠 | 多平台支援 |
+| Risk | 等級 | 緩解 |
+|---|---|---|
+| 圖庫 API 漲價 / 關閉 | 🟠 | 3 家 fallback |
+| AI 文案觸發審查 | 🟡 | Moderation + 重新生成 |
+| Imgflip / Canva 出繁中 | 🟡 | 持續搶 Threads/IG niche + 速度 |
+| Threads buffer API 限制 | 🟡 | 排程失敗自動 email |
+| Canva Threads 模板追上 | 🟠 | 持續 AI 文案 + 商用安全 |
 
 ### 7.2 ⭐ ADR
 
-#### ADR-001: 為何放棄 Picsum、改用 Unsplash / Pexels
+**ADR-001 為何砍 Picsum？**
+- 決策：v2.2.2 100% 用 Pexels + Unsplash + Pixabay
+- 理由：Picsum 雖 CC0 但無語意、版權聲明模糊，商用風險高
+- 取捨：成本上升（3 API key），但商用安全
 
-**Context**: 原 v2.2.1 PRD 用 Picsum 隨機圖源（Picsum 是 Lorem Picsum 的隨機圖、無語意、版權需查清）。
+**ADR-002 為何不做英文？**
+- 決策：v1 繁中 only
+- 理由：Threads / IG 繁中 niche 真實存在、英文搶不過 Imgflip / Canva
+- 取捨：放棄 100M 英文市場、拿 100% 繁中獲利
 
-**Decision**: **完全放棄 Picsum**，改用 Unsplash + Pexels（明確 CC0、可商用）。
-
-**Consequences**:
-- ✅ 版權 100% 合法（Unsplash License / Pexels License）
-- ✅ 可語意搜尋（「貓」「海灘」）
-- ✅ 高品質圖（vs Picsum 隨機低品質）
-- ⚠️ API 有 rate limit（每小時 50 次）→ 已加降級
-- ⚠️ 需用戶註冊 Unsplash / Pexels API key（M3 後由 Sean 自建）
-
-#### ADR-002: 為何選擇 Fabric.js 而非 Konva.js
-
-**Context**: 兩者都是 Canvas 編輯器庫。
-
-**Decision**: 用 **Fabric.js**（更成熟、文件多）。
-
-**Consequences**:
-- ✅ Fabric.js 文件齊全、社群大
-- ✅ 內建序列化（存 SVG-like JSON）
-- ✅ 與 React 整合容易（react-konva 也可用）
-- ⚠️ 大檔案效能受限 → 已加降級到 Konva.js
-
-#### ADR-003: 為何 AI 文案是核心、不是附屬
-
-**Context**: AI 文案 = 「自動生成諧音梗」對小編價值高。
-
-**Decision**: **AI 文案是核心差異化**，不是附屬。
-
-**Consequences**:
-- ✅ Canva / Imgflip 都沒有繁中 AI 文案
-- ✅ 降低小編思考成本（不必每天想梗）
-- ✅ 提升 LTV（從「工具」變「助理」）
-- ⚠️ OpenAI 成本（NT$0.3/張）→ 已含在訂閱價
-
-#### ADR-004: 為何預設過濾政治內容
-
-**Context**: 政治梗圖在 Threads / IG 是流量密碼，但風險高。
-
-**Decision**: **預設過濾政治內容**，企業版可關閉。
-
-**Consequences**:
-- ✅ 避免品牌客戶被政治內容拖下水
-- ✅ 降低平台審核風險
-- ⚠️ 失去政治梗流量（但安全性高）
-- ⚠️ 過濾可能誤判 → 提供「人工審核上訴」
+**ADR-003 為何 Threads buffer API 不做 IG 自動發文？**
+- 決策：v2 Threads buffer 為主，IG API v3 再加
+- 理由：IG Graph API 審核嚴、Threads buffer 友善
+- 取捨：IG 用戶需手動，但 v3 會加
 
 ---
 
-## 8. 里程碑與 Sprint 拆解
+## 8. 里程碑與 Sprint
 
-### 8.1 里程碑總覽
+### 8.1 里程碑
 
-| 里程碑 | 時程 | 產出 |
+| M | 時程 | 產出 |
 |---|---|---|
-| M0 - 內容衝刺 | W1-4 | 200 模板 + Unsplash 整合 |
-| M1 - MVP | W5-12 | 5 features 上線 + 100 用戶 beta |
-| M2 - GA | W13-16 | 公開上線 + Threads / IG 紅人行銷 |
-| M3 - 變現 | W17-24 | 3,000 付費 + 300K MRR |
-| M4 - v2 直接發文 | W25-36 | Threads API + 品牌套件 + B2B |
+| M0 銳化 | W1-2 | 本 PRD + 訪談 5 創作者 + 2 品牌 |
+| M1 MVP | W3-8 | F-001~F-009 + 50 付費 beta |
+| M2 GA | W9-12 | 公開 + Threads KOL 行銷 |
+| M3 PMF | W13-24 | 800 付費 + 10 企業 = NT$500K MRR |
+| M4 規模 | W25-36 | 3000 付費 + 40 企業 = NT$2M MRR |
 
-### 8.2 Sprint 拆解
+### 8.2 Sprint
 
-| Sprint | 主題 | 交付 |
-|---|---|---|
-| S1 | 模板庫（200+ 原創）| 全部 CC0 |
-| S2 | Unsplash / Pexels 整合 | 搜尋 + 篩選 |
-| S3 | Canvas 編輯器（Fabric.js）| 文字 + 圖片層 |
-| S4 | AI 文案助理 | GPT-4o mini 對話 |
-| S5 | 多尺寸輸出 | 4 種尺寸 |
-| S6 | 浮水印 + 配額 | 變現機制 |
-| S7 | Beta 100 用戶 | 收 feedback、修 bug |
-| S8 | GA + 訂閱牆 | 4 訂閱方案 |
+| S | 主題 |
+|---|---|
+| S1 | Pexels + Unsplash + Pixabay 聚合圖庫 |
+| S2 | 繁中梗詞庫 300 詞 + Threads 熱榜爬蟲 |
+| S3 | Fabric.js 編輯器 + 多尺寸預覽 |
+| S4 | GPT-4o-mini 梗文案 + Moderation |
+| S5 | CC0 商用聲明 + 強制不可商用擋下載 |
+| S6 | Threads buffer 排程 + GA 上線 |
 
 ---
 
-## 9. 變現路徑 + 定價心理學
+## 9. 變現 + 定價心理學
 
-### 9.1 變現方案
+### 9.1 方案
 
-| 方案 | 月費 | 額度 | 目標 |
-|---|---|---|---|
-| 🆓 Free | NT$0 | 10 張/月、有浮水印 | 試用 |
-| 👤 Personal | NT$99 | 100 張、無浮水印、AI 文案 | 個人小編 |
-| 🎨 Creator | NT$299 | 500 張、批次、品牌套件 | 創作者 |
-| 🏢 Business | NT$999 | 無限、API、SSO、團隊 | 企業 / 代理商 |
+| 方案 | 月費 | 額度 |
+|---|---|---|
+| 🆓 Free | NT$0 | 5 張/月、浮水印 |
+| 👤 Personal | NT$99 | 100 張、無浮水印 |
+| 🎨 **Creator** | **NT$299** | **500 張 + AI 文案 + Threads 排程** |
+| 🏢 **Team** | **NT$799** | **2000 張 + 5 帳號 + 商用授權書** |
+| 🎯 Brand | NT$9,999+ | 客製無限 |
 
 ### 9.2 定價心理學
-
-- **NT$99 vs NT$100**：心理門檻
-- **NT$299 對標 Canva**：Canva Pro NT$300/月，我們略便宜但功能較少 → 對小編夠用
-- **NT$999 對標 Figma**：Figma NT$900/月 + 設計技能，我們 NT$999 含 AI 文案 → 對小編勝出
-- **年繳 8 折**：提升 LTV
-- **不綁約**：月繳可取消（小編對訂閱敏感）
+- **NT$99 vs NT$100**：心理門檻、學生付費線
+- **NT$299 對標 Canva Pro NT$130/月 + Threads 排程**：仍比一位小編 NT$30K/月 便宜
+- **NT$799 團隊**：1 帳號 NT$799、5 帳號 = NT$160/人
+- 年繳 8 折提升 LTV
 
 ---
 
 ## 10. 附錄
 
-### 10.1 競品分析 (Competitive Quadrant)
+### 10.1 Quadrant
 
 ```
-                  高繁中支援
-                    │
-       台灣小工具   │   ★ 本產品
-       (功能簡單)   │   (AI + 正版 + 多尺寸)
-                    │
-   低月費 ──────────┼────────── 高月費
-                    │
-       Imgflip      │   Canva Pro
-       (英文為主)   │   (功能複雜)
-                    │
-                  低繁中支援
-
-   ★ 本產品甜蜜點：高繁中支援 + 中月費
+       高 AI 整合
+         │
+  Imgflip│  ★ 本產品
+         │   (繁中 + AI 文案 + Threads 尺寸)
+         │
+低月費 ───┼── 高月費
+         │
+  Canva  │  Buffer
+         │   排程專業
+       低 AI 整合
 ```
 
 ### 10.2 術語表
 
 | 術語 | 定義 |
 |---|---|
-| 梗圖 | meme，網路迷因圖片 |
-| 模板 | 可重複使用的設計版面 |
-| Unsplash License | 免費商用、不可單獨轉售 |
-| Pexels License | 免費商用、可編輯 |
-| Threads | Meta 的純文字社群平台 |
-| Canvas | HTML5 圖片編輯技術 |
-| Fabric.js | Canvas 函式庫 |
+| Threads | Meta 文字社群（前 Twitter）|
+| IG Reels | Instagram 短影音 |
+| CC0 | Creative Commons Zero，無版權 |
+| Fabric.js | HTML5 canvas 編輯函式庫 |
+| Buffer | 社群排程工具 |
 
 ---
 
 ## 11. ⭐ 市場驗證計畫
 
-### 11.1 驗證前 3 個關鍵問題
+### 11.1 假設
 
-1. **Threads / IG 創作者願不願意付 NT$99/月 產梗圖？**（假設：願意，因 Canva NT$300/月功能太多複雜）
-2. **200 繁中模板夠用嗎？**（假設：MVP 階段夠，v2 增至 1,000 模板）
-3. **AI 繁中文案品質夠好嗎？**（假設：70% 可用、30% 需手動改）
+| 假設 | 驗證 | 成功 |
+|---|---|---|
+| **H1**: 5/5 Threads 創作者想用（省時） | 訪談 + beta | 5 yes |
+| **H2**: AI 文案 80% 可用 | 內部測 | ≥80% |
+| **H3**: 1 品牌小編願付 NT$799/月 | 訪談 2 品牌 | 1 yes |
 
-### 11.2 訪談 SOP
-
-**5 個訪談目標**：
-1. 📱 **小美** - Threads 萬粉創作者 → 訪談每日發文流程、付費意願
-2. 📲 **阿明** - IG 限動小編（5 萬粉）→ 訪談多尺寸需求
-3. 💼 **王總** - 品牌行銷小編 → 訪談企業需求、品牌套件
-4. 🎓 **志明** - 大學班代 / 系學會 → 訪談學生使用場景
-5. 🎨 **Nina** - 自由接案小編 → 訪談多客戶管理
-
-**訪談問題模板**（30 分鐘）：
-
-1. 你目前怎麼做梗圖？（現況）
-2. 你試過哪些工具？（Canva / Imgflip）
-3. 什麼時候會付費？（付費意願）
-4. 你最常用什麼尺寸？（Threads / IG / LINE）
-5. 你擔心 AI 工具的什麼風險？
-
-### 11.3 落地指標
-
-| 指標 | 目標（M3）|
-|---|---|
-| 訪談完成數 | 20 人（10 創作者、5 行銷、5 學生）|
-| Landing page 訪客 | 5,000 UV |
-| Beta 用戶 | 500 人 |
-| 付費轉換 | 50 人（驗證 NT$99/月）|
-| 月梗圖產出 | 30,000 張 |
-
-### 11.4 1 個 Community Post
-
-**Threads / Dcard / Threads 創作者圈**：標題「[工具] 30 秒做出 Threads / IG 梗圖，繁中模板 200+」→ 引發討論、回饋。
-
-### 11.5 1 個 Landing Page Test
-
-**URL**：tw-meme-generator.vercel.app/pricing-test
-**A/B 測試**：
-- A：標題「30 秒做 Threads / IG 梗圖，繁中模板 200+」
-- B：標題「社群小編神器 — 正版圖 + AI 文案 + 多尺寸輸出」
-**指標**：點擊「免費試用 10 張」CTA 比率，目標 ≥ 18%
+### 11.2 訪談（W1-2）
+- 3 Threads 創作者 (>5K followers)
+- 2 IG 限動小編
+- 2 品牌 / 企業社群小編
 
 ---
 
 ## 12. ⭐ 失敗模式 SOP
 
-| 失敗模式 | 觸發條件 | SOP |
-|---|---|---|
-| M1 - 創作者付費意願低 | 500 beta < 30 付費 | 重新定價 NT$49/月試水溫 |
-| M2 - 模板版權爭議 | 收到 1 個 DMCA | 立即下架 + 律師 review |
-| M3 - Unsplash API 故障 | 月故障 > 5 次 | 切換 Pexels 主 |
-| M4 - Threads API 政策變動 | Meta 公告限制 | 降級為「下載圖片手動發」|
-| M5 - AI 文案品質差 | 人工評估 < 6/10 | 強化 prompting + 預設範本 |
-| M6 - 政治內容過濾誤判 | 收到 5+ 投訴 | 提供人工上訴 + 改進 NLP |
-| M7 - Canva 進入繁中梗圖 | Canva 公告新功能 | 強化「在地化 + 小編專用」定位 |
-| M8 - Sean 一人公司過載 | 同時管 1,000+ 付費 | Chatbot + Help Center |
+### F1. Pexels / Unsplash API 漲價 / 關閉
+- 切 Pixabay 為主 + 提示「圖庫維護中」
+- 蒐集自營 CC0 圖庫（成自家資產）
+
+### F2. Threads buffer API 變動
+- 切排程到 e2e 測試後 email 通知手動發
+- 評估自建 Threads scraper（但禁止）
+
+### F3. AI 文案觸發審查
+- 重新生成 + 提示用戶
+- 冷卻 30s 後再試
+
+### F4. Canva 上 Threads 1:1 模板
+- 持續 AI 文案 + 商用授權 + 速度護城河
+- 進軍 Canva 沒做的 AI 個人化訓練
+
+### F5. 商用侵權事件
+- 全 CC0 標章 + 來源顯示
+- 提供「侵權保險」（企業版 NT$799/月含）
 
 ---
 
 ## 13. ⭐ MetaGPT / spec-kit 對齊
 
-### 13.1 MetaGPT 角色對應
+### 13.1 Pool
+- **P0**：F-001~F-009
+- **P1**：F-101~F-106
+- **P2**：F-201~F-204
 
-| MetaGPT 角色 | 本專案對應 |
+### 13.2 MUST / SHOULD / MAY
+
+| 標籤 | 項目 |
 |---|---|
-| Product Manager | Sophia (CPO) |
-| Architect | Alan (CTO) |
-| Designer | Sean（兼任）|
-| Engineer | Sean + Hermes Agent |
-| Content Manager | Sean（模板製作）|
+| MUST | 3 圖庫聚合、AI 文案、3 尺寸直出、CC0 商用 |
+| SHOULD | Threads 排程、企業商用授權書、品牌字型 |
+| MAY | 短影音模板、GIF 梗、馬來西亞繁中 |
 
-### 13.2 spec-kit 指令
+### 13.3 Quadrant
 
-```yaml
-spec-kit init tw-meme-generator
-spec-kit add requirement "200 繁中模板"
-spec-kit add requirement "Unsplash / Pexels 整合"
-spec-kit add requirement "Canvas 編輯器 (Fabric.js)"
-spec-kit add requirement "AI 文案助理 (GPT-4o mini)"
-spec-kit add requirement "多尺寸輸出 (4 種社群)"
-spec-kit plan --milestone v2
-spec-kit implement --sprint S1-S8
+```
+      高 LTV
+       │
+  Free │  ★ Team / Brand
+       │
+低可行性─┼─ 高可行性
+       │
+       │  Personal / Creator
+      低 LTV
 ```
 
-### 13.3 Git Workflow
+### 13.4 Open Questions
 
-- branch：`feature/templates`、`feature/image-search`、`feature/ai-caption`、`feature/scheduled-post`
-- Conventional Commits
-- 砍掉 Picsum 相關 commits
+| # | 問題 | 待 |
+|---|---|---|
+| Q1 | Pexels / Unsplash / Pixabay API 成本比較 | Alan |
+| Q2 | Buffer Threads API 限制 | 業務 |
+| Q3 | 商用授權書法律細節 | 律師 |
+| Q4 | Threads / IG 自動發文風險 | 業務 |
 
 ---
 
-## 15. ⭐ 深度市調報告 (本次的 sweet spot 體檢結果)
+## 15. ⭐ 深度市調報告 (Sweet Spot 5 問)
 
-### 15.1 Sweet Spot 5 問體檢 — tw-meme-generator
+### 15.1 5 問體檢
 
-**Score: 5/10（investigate，找出甜蜜點）**
+**最終商業化評分**：**69 / 100**
+- 公式：(PRD × 0.3 + sweet × 0.7) × 10
+- PRD 規格 = 9 / 10（v2.2.2 14 區塊 + AC + 降級 + 法律 CC0）
+- Sweet Spot = 6 / 10（銳化繁中 Threads/IG + AI 文案 + 商用安全，從 5 升 6）
+- 計算：(9×0.3 + 6×0.7) × 10 = **69**
 
-#### Q1: 這個市場已經有誰在做？
+#### Q1 市場已有誰？
 
-| 競品 | 用戶數 | 月費 | 繁中梗圖 |
+| 競品 | 用戶 | 月費 | 繁中 Threads |
 |---|---|---|---|
 | **Imgflip** | 30M+ | Free-$6 | ⚠️ 英文 |
-| **Kapwing** | 10M+ | Free-$16 | ⚠️ |
-| **Canva** | 200M+ | Free-$13 | ✅ |
-| **Figma + Unsplash** | 4M+ | Free-$12 | ✅ |
-| **台灣小工具** | 100K+ | Free | ⚠️ 簡單 |
-| **本產品 v1** | 50-500 | Free | ✅ |
+| **Canva** | 200M+ | Free-$13 | ✅ 通用非梗圖 |
+| **Figma** | 4M+ | Free-$12 | ✅ |
+| **Picsum** | — | Free | ❌ 無語意 |
+| **Threads buffer / Later** | 1M+ | $6+ | ⚠️ 排程非作圖 |
+| **繁中梗圖 + Threads 1:1 + AI 文案** | — | — | **空白** |
 
-**現況**：圖片編輯器紅海（Canva / Imgflip），但「**繁中社群小編專用 + 正版圖庫 + 多尺寸**」是甜蜜點。
+#### Q2 甜蜜點？
+**甜蜜點 = 繁中唯一 Threads / IG 梗圖工廠（一條龍）**
+- Imgflip：英文紅海
+- Canva：通用工具、無 AI 文案
+- Figma：設計工具非梗圖
 
-#### Q2: 我的甜蜜點在哪？
+#### Q3 紅海（不做）
+- ❌ 英文 / 日文（v1 繁中 niche）
+- ❌ AI 圖像生成（Midjourney / DALL-E 紅海）
+- ❌ 影音剪輯（CapCut 紅海）
+- ❌ 短影音生成（Sora / Veo 紅海）
+- ❌ GIF / Giphy 紅海
+- ❌ 進階排程（Buffer / Later 紅海）
 
-**甜蜜點 = Threads / IG 創作者 + 品牌小編**
+#### Q4 紅海外差異化？
+> **「繁中唯一 Threads/IG 梗圖工廠 — 商用圖 + AI 文案 + 一鍵 9:16 / 1:1 直出」**
+1. **3 圖庫 CC0 聚合**（Pexels + Unsplash + Pixabay）
+2. **GPT-4o-mini 繁中 3 種梗文案**
+3. **一鍵 3 尺寸直出**（Threads 1:1 + IG Reels 9:16 + IG 限動 9:16）
+4. **強制 CC0 + 來源標示**（無侵權）
+5. **Threads buffer API 排程**
 
-- Canva 太複雜（小編只需「梗圖」）
-- Imgflip 英文為主
-- Figma 需設計技能
-- 台灣小工具版權不清
+#### Q5 一人公司能否負擔？
+- 開發：MVP ~25 人天 → Sean 5 週可完成
+- 營運：M12 預估 NT$12K/月（GPT-4o-mini + Vercel + Postgres + 3 圖庫 API）
+- GPT 成本佔比 30%，毛利 65%
+- CAC：Threads KOL + SEO 自然流量，趨近零
 
-**甜蜜點具體描述**：**繁中 Threads / IG 梗圖一鍵產生（30 秒） + AI 文案 + 4 種社群尺寸**。
-
-#### Q3: 紅海功能（不能做）
-
-- ❌ AI 生成圖（DALL·E / Midjourney 紅海）
-- ❌ 影片剪輯（CapCut 紅海）
-- ❌ 完整設計工具（Figma 紅海）
-- ❌ LINE Bot / 訊息整合（與圖片失焦）
-- ❌ NFT / 加密梗圖（紅海）
-
-#### Q4: 紅海之外的差異化承諾
-
-> **「繁中 Threads / IG 梗圖 + 正版圖 + AI 文案 + 30 秒出圖」**
-
-具體差異化：
-1. **繁中模板 200+**：Canva / Imgflip 沒有
-2. **正版圖庫**：避開 Picsum 版權風險
-3. **AI 繁中文案**：差異化關鍵
-4. **4 種社群尺寸**：小編必備
-5. **30 秒速度**：即戰力
-
-#### Q5: Sean 一人公司能否負擔？
-
-- **開發成本**：5 features、4 人月（砍 Picsum 省 1 月）
-- **營運成本**：M12 預估 NT$30K/月（Unsplash / Pexels API + GPT + R2 + Vercel）
-- **獲客成本**：Threads / IG 紅人合作 + Dcard 行銷，CAC = NT$500/付費用戶
-- **客服成本**：80% Chatbot + 15% Help Center + 5% 人工
-
-**結論**：可負擔，LTV/CAC = 11:1 健康。
+**結論**：可負擔，毛利 65%，甜蜜點清晰。**M1 招募 5 Threads 創作者 + M3 1 品牌小編付費**才進入規模。
 
 ### 15.2 重寫決策
 
-原 v2.2.1 PRD（911 行）用 Picsum 隨機圖源（版權風險、退件原因）。本版**完全放棄 Picsum**，改用 Unsplash + Pexels 正版圖庫，甜蜜點分數從 5 → 預估 **7/10**。
+| 改變 | v2.2.1 | v2.2.2 |
+|---|---|---|
+| 圖源 | Picsum / Unsplash | **3 圖庫聚合 + 強制 CC0** |
+| AI | 無 | **GPT-4o-mini 繁中梗文案** |
+| 變現 | 4 方案 | **+ 團隊 NT$799 企業版** |
+| TA | Threads / IG / 行銷 | **鎖定小琪 + 阿德 + Lisa** |
 
 ### 15.3 與 v1 差異
 
-| 面向 | v1 | v2.2.1 |
-|---|---|---|
-| 圖源 | Picsum（版權風險）| Unsplash + Pexels（CC0）|
-| AI 文案 | ❌ | ✅ GPT-4o mini |
-| 尺寸 | 單一 | 4 種社群 |
-| 模板 | < 50 | 200+ |
-| 目標 | 任何人 | Threads / IG 小編 |
+| 面向 | v1 | v2.2.1 | v2.2.2 |
+|---|---|---|---|
+| 圖源 | Picsum 隨機 | Pexels+Unsplash | **3 圖庫 + CC0** |
+| AI | ❌ | ❌ | **GPT 文案** |
+| 變現 | 4 | 4 | **+ 團隊 NT$799** |
+| 商用 | 不明 | 標示 | **強制 CC0 + 擋下載** |
 
-### 15.4 後續驗證動作
-
-- [ ] W1-4 完成 200 模板 + Unsplash 整合
-- [ ] W5-12 完成 MVP 5 features
-- [ ] W13-20 完成 500 用戶 beta
-- [ ] W21 評估 PMF：付費轉換率 ≥ 10% 才進入 GA
+### 15.4 後續驗證
+- [ ] W1-2 訪談 7 人
+- [ ] W3-8 MVP + 50 付費 beta
+- [ ] W9-12 GA + Threads KOL 行銷
+- [ ] W13-24 PMF：800 付費 + 10 企業 = NT$500K MRR → 規模化
 
 ---
 
-> 對接產線：https://tw-meme-generator.vercel.app
 > 對接 Repo：https://github.com/openclawsean024-create/tw-meme-generator
-> 維護者：Sophia (CPO) for Sean｜下次 review：M3 後
