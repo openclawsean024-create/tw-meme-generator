@@ -1,7 +1,11 @@
 {
   "name": "tw-meme-generator",
-  "version": "1.0.0",
+  "version": "3.0.0",
   "private": true,
+  "engines": {
+    "node": ">=20",
+    "npm": ">=10"
+  },
   "scripts": {
     "dev": "next dev -p 3000",
     "build": "next build",
@@ -15,16 +19,16 @@
     "geist": "^1.7.2",
     "html-to-image": "^1.11.11",
     "lucide-react": "^0.426.0",
-    "next": "14.2.5",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
+    "next": "^16.2.10",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
     "react-rnd": "^10.4.1",
     "tesseract.js": "^5.1.0"
   },
   "devDependencies": {
     "@types/node": "^20.14.13",
-    "@types/react": "^18.3.3",
-    "@types/react-dom": "^18.3.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.41",
     "tailwindcss": "^3.4.10",
