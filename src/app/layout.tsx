@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
+import { MotionConfig } from "framer-motion";
 import "./globals.css";
 import Link from "next/link";
 import { Sparkles } from "lucide-react";
@@ -25,6 +26,7 @@ export default function RootLayout({
       <body
         className={`${GeistSans.variable} ${GeistMono.variable} antialiased bg-background text-ink`}
       >
+        <MotionConfig reducedMotion="user">
         <div className="relative z-10 flex min-h-screen flex-col">
           <header className="sticky top-0 z-30 border-b border-white/5 bg-background/80 backdrop-blur">
             <div className="container-page flex h-14 items-center justify-between">
@@ -42,6 +44,7 @@ export default function RootLayout({
               <nav className="flex items-center gap-1 text-sm">
                 <Link href="/gallery" className="btn-ghost">圖庫</Link>
                 <Link href="/?section=ranking" className="btn-ghost">排行</Link>
+                <Link href="/favorites" className="btn-ghost">收藏</Link>
                 <Link href="/gallery" className="btn-primary text-sm py-1.5 px-3">
                   開始製作
                 </Link>
@@ -55,6 +58,7 @@ export default function RootLayout({
             </div>
           </footer>
         </div>
+        </MotionConfig>
       </body>
     </html>
   );

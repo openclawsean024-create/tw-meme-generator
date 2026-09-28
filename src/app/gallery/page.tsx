@@ -2,6 +2,7 @@ import Link from "next/link";
 import { PenLine, PlusCircle } from "lucide-react";
 import memesData from "@/data/memes.json";
 import type { Meme } from "@/types";
+import FavoriteButton from "@/components/FavoriteButton";
 
 export const metadata = {
   title: "梗圖圖庫 | TW Meme Generator",
@@ -65,6 +66,9 @@ function MemeCard({ meme, mode }: { meme: Meme; mode: "replace" | "add" }) {
         />
         <span className="absolute left-2 top-2 rounded-full bg-black/60 px-2 py-0.5 text-[10px] uppercase backdrop-blur">
           {mode === "replace" ? "替換" : "新增"}
+        </span>
+        <span className="absolute right-2 top-2 transition-opacity">
+          <FavoriteButton memeId={meme.id} variant="overlay" />
         </span>
       </div>
       <div className="p-2 text-center">
