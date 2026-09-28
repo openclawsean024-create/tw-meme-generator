@@ -7,18 +7,20 @@ import type { Meme } from "@/types";
 import MemeDetailClient from "./MemeDetailClient";
 
 interface Params {
-  params: { id: string };
-  searchParams: { share?: string };
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ share?: string }>;
 }
 
 export const dynamic = "force-dynamic";
 
-export default function MemeDetailPage({ params, searchParams }: Params) {
-  const meme = (memesData as Meme[]).find((m) => m.id === params.id);
+export default async function MemeDetailPage({ params, searchParams }: Params) {
+  const { id } = await params;
+  const sp = await searchParams;
+  const meme = (memesData as Meme[]).find((m) => m.id === id);
   if (!meme) notFound();
 
   const seed = rankData
-    .filter((r) => r.memeId === params.id)
+    .filter((r) => r.memeId === id)
     .map((r) => ({
       ...r,
       regions: [],
@@ -39,7 +41,7 @@ export default function MemeDetailPage({ params, searchParams }: Params) {
           這個梗圖所有使用者創作的版本都在這裡。點擊任一張可看大圖。
         </p>
       </div>
-      <MemeDetailClient meme={meme} seed={seed} highlightShareId={searchParams.share} />
+      <MemeDetailClient meme={meme} seed={seed} highlightShareId={sp.share} />
     </div>
   );
 }

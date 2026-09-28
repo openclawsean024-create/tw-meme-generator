@@ -4,6 +4,7 @@ import memesData from "@/data/memes.json";
 import rankData from "@/data/rankings.json";
 import { mergeAndRank } from "@/lib/rank";
 import RankList from "@/components/RankList";
+import TrendingRadar from "@/components/TrendingRadar";
 import type { Meme } from "@/types";
 
 export default function HomePage() {
@@ -94,6 +95,11 @@ export default function HomePage() {
           </Link>
         </div>
         <RankList items={ranked} memeMap={memeMap} />
+      </section>
+
+      {/* trending radar (FR-009) */}
+      <section className="container-page">
+        <TrendingRadar limit={6} />
       </section>
     </div>
   );

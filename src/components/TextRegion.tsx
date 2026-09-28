@@ -1,8 +1,10 @@
 "use client";
 
 import { Rnd } from "react-rnd";
+import { motion, useReducedMotion } from "framer-motion";
 import { X, GripVertical } from "lucide-react";
 import clsx from "clsx";
+import { MOTION_TOKENS, clampRegionToCanvas } from "@/lib/canvas-geometry";
 
 export interface TextRegionProps {
   id: string;
@@ -19,6 +21,8 @@ export interface TextRegionProps {
   onSelect?: () => void;
   onDelete?: () => void;
   containerSize: { width: number; height: number };
+  /** Ratio between rendered CSS pixels and logical 600px source coordinates. */
+  scale?: number;
 }
 
 export default function TextRegion(props: TextRegionProps) {
@@ -36,40 +40,64 @@ export default function TextRegion(props: TextRegionProps) {
     onSelect,
     onDelete,
     containerSize,
+    scale = 1,
   } = props;
+  const reducedMotion = useReducedMotion() ?? false;
 
   return (
     <Rnd
       bounds="parent"
-      size={{ width: w, height: h }}
-      position={{ x, y }}
+      size={{ width: w * scale, height: h * scale }}
+      position={{ x: x * scale, y: y * scale }}
       onDragStart={onSelect}
       onDragStop={(_, d) => {
-        if (d.x < 0 || d.y < 0 || d.x + w > containerSize.width || d.y + h > containerSize.height) {
-          const cx = Math.max(0, Math.min(d.x, containerSize.width - w));
-          const cy = Math.max(0, Math.min(d.y, containerSize.height - h));
-          onChange({ x: cx, y: cy });
-          return;
-        }
-        onChange({ x: d.x, y: d.y });
+        // FR-003: clamp to the canvas that MemeCanvas reported, NOT a
+        // hardcoded 600×600 — 9:16 and 4:5 must let text reach the bottom.
+        const next = clampRegionToCanvas(
+          { x: d.x / scale, y: d.y / scale, w, h },
+          containerSize,
+        );
+        onChange({ x: next.x, y: next.y });
       }}
       onResizeStart={onSelect}
       onResizeStop={(_, __, ref, ___ , position) => {
-        onChange({
-          w: ref.offsetWidth,
-          h: ref.offsetHeight,
-          x: position.x,
-          y: position.y,
-        });
+        const next = clampRegionToCanvas(
+          {
+            x: position.x / scale,
+            y: position.y / scale,
+            w: ref.offsetWidth / scale,
+            h: ref.offsetHeight / scale,
+          },
+          containerSize,
+        );
+        onChange({ w: next.w, h: next.h, x: next.x, y: next.y });
       }}
-      minWidth={60}
-      minHeight={36}
+      minWidth={60 * scale}
+      minHeight={36 * scale}
+      enableResizing={{}}
       className={clsx(
-        "group rounded-md ring-1 transition-shadow",
-        selected ? "ring-2 ring-accent-pink shadow-glow" : "ring-white/40 hover:ring-accent-purple",
+        "group rounded-md ring-1",
+        selected ? "ring-2 ring-accent-pink" : "ring-white/40 hover:ring-accent-purple",
       )}
     >
-      <div className="relative h-full w-full overflow-hidden rounded-md">
+      {/*
+        FR-012: selection affordance — soft scale + ring tint transition.
+        Wrapping <Rnd>'s output in a motion.div keeps the transform on the
+        compositor (no layout shift) and respects MotionConfig
+        reducedMotion="user" automatically — when prefers-reduced-motion is
+        active the duration collapses to 0.
+      */}
+      <motion.div
+        className="relative h-full w-full overflow-hidden rounded-md shadow-glow"
+        animate={{
+          scale: selected ? 1.02 : 1,
+        }}
+        whileHover={{ scale: selected ? 1.02 : 1.01 }}
+        transition={{
+          duration: reducedMotion ? 0 : MOTION_TOKENS.REGION_AFFORDANCE_MS / 1000,
+          ease: "easeOut",
+        }}
+      >
         {selected && (
           <button
             type="button"
@@ -90,6 +118,7 @@ export default function TextRegion(props: TextRegionProps) {
           </span>
         )}
         <textarea
+          aria-label="文字框內容"
           value={text}
           onFocus={onSelect}
           onChange={(e) => onChange({ text: e.target.value })}
@@ -98,7 +127,7 @@ export default function TextRegion(props: TextRegionProps) {
           style={{
             color,
             fontWeight,
-            fontSize: `${fontSize}px`,
+            fontSize: `${fontSize * scale}px`,
             WebkitTextStroke: fontWeight === "bold" ? "1px rgba(0,0,0,0.9)" : "0.5px rgba(0,0,0,0.7)",
             textShadow:
               fontWeight === "bold"
@@ -112,7 +141,7 @@ export default function TextRegion(props: TextRegionProps) {
           )}
           placeholder="輸入文字"
         />
-      </div>
+      </motion.div>
     </Rnd>
   );
 }

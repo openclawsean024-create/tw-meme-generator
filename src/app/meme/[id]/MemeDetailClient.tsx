@@ -6,6 +6,7 @@ import { Heart, Share2 } from "lucide-react";
 import clsx from "clsx";
 import type { Meme } from "@/types";
 import { type ShareRecord, readAllShares, bumpShareCount, bumpLikeCount } from "@/lib/storage";
+import FavoriteButton from "@/components/FavoriteButton";
 
 interface MemeDetailClientProps {
   meme: Meme;
@@ -41,9 +42,12 @@ export default function MemeDetailClient({
 
   return (
     <div className="space-y-3">
-      <p className="text-sm text-muted">
-        共 {all.length} 個版本。seed 資料由後台預載,你的版本會在 localStorage 中保留。
-      </p>
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-sm text-muted">
+          共 {all.length} 個版本。seed 資料由後台預載,你的版本會在 localStorage 中保留。
+        </p>
+        <FavoriteButton memeId={meme.id} variant="solid" />
+      </div>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {all.map((s) => (
           <VersionCard
