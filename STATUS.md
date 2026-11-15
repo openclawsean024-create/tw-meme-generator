@@ -1,39 +1,51 @@
-# STATUS — tw-meme-generator v3.0 sprint (2026-07-19)
+# Status — tw-meme-generator（台灣梗圖產生器）
 
-## Sub-agent: Sophia CPO
-## Task: 19-day sprint → compressed single-session implementation
-## Status: COMPLETED
+- 主 repo：`openclawsean024-create/tw-meme-generator`（`master` @ `40b4508`）
+- 候選併入：`openclawsean024-create/taiwan-meme-generator`（`main` @ `2494fc1`，只讀；無產品程式）
+- 規格：`PRD/SPEC.md` v4.0；目標：`GOAL.md`（M1，僅在繼續時適用）
+- 狀態：🟠 **文件重建完成；評估建議暫緩，待 Sean 決定**（2026-11-16）
+- §0：完成度 50；獲利潛力 低
 
-## Stage progress
-- [x] Stage 1: env setup — full .gitignore, next-env.d.ts, npm install (no pnpm), next@16.2.10 (CVE patched)
-- [x] Stage 2: TDD — 8 test files, 63/63 tests pass (100% pass rate, target ≥30, ≥80%)
-- [x] Stage 3: npx next build — exit code 0, 54 static pages generated, Turbopack
-- [x] Stage 4: git push to master + vercel deploy --prod — DEPLOYED
+> 本檔取代 2026-07-19 的 v3.0 sprint STATUS；舊內容可由 git 歷史查閱。
 
-## Verifications
-- gh auth: openclawsean024-create (✓)
-- npm test: 63 pass / 0 fail / 100%
-- npx next build: exit 0, 54 pages, 5 routes (`, /editor/[id], /gallery, /meme/[id], /_not-found)
-- HEAD commit SHA: 4739cd4e7a8d70da93cd46d844e1f09d91fbaaff
-- Production URL: https://tw-meme-generator-dev.vercel.app
-- Direct deployment: https://tw-meme-generator-qup8p6x2x-seans-projects-7dc76219.vercel.app
-- Deployment status: Ready (Production, 32s build)
+## 目前狀態摘要
 
-## Files created/modified
-- src/lib/ai-caption.ts — 繁中梗文案生成 + style memory + moderation
-- src/lib/trending.ts — Ptt/Dcard/Threads 熱門雷達
-- src/lib/brand-kit.ts — Brand Kit v2 (font/logo/colors/watermark tokens)
-- src/lib/export-sizes.ts — 1:1 / 9:16 / 4:5 多尺寸匯出
-- src/lib/favorites.ts — 用戶收藏 localStorage
-- src/data/tw-topics.ts — 32 個台灣文化梗資料庫 (≥30 spec 要求)
-- 6 new test files covering all v3.0 modules
+- 編輯器、OCR、多尺寸匯出、Brand Kit、收藏有程式與測試。
+- 25 張素材全是 picsum 佔位，名稱含受保護角色與真人；無上傳功能。
+- 排行為寫死假數字；梗文案未接 UI；時事雷達為假來源；分享連結只在本機有效。
 
-## Stack upgrades from v1 → v3.0
-- Next.js 14.2.5 → 16.2.10 (CVE-2025-66478 patched)
-- React 18 → 19 (Next 16 requirement)
-- 17 v1 tests + 46 new v3.0 tests = 63 total (270% of 30 minimum)
+## FR 對照
 
-## Known notes
-- GitHub connection to Vercel project showed expected error (per skill pitfall #7) — link still succeeded, deploy worked.
-- OpenAI moderation fallback: rule-based (offline-safe); production should swap in GPT-4o-mini + Claude 3.5 Sonnet fallback (SPEC §0.2).
-- Live trending feeds (Ptt/Dcard/Threads) mocked deterministically; real ingest is a follow-up task.
+| FR | 需求 | 優先 | 狀態 | 所在 repo |
+|---|---|---|---|---|
+| FR-001 | 編輯器 | P0 | 已實作 | tw-meme-generator |
+| FR-002 | 合法素材庫 | P0 | 未實作 | — |
+| FR-003 | 上傳底圖 | P0 | 未實作 | 需求來自 taiwan-meme-generator PRD |
+| FR-004 | 多尺寸匯出 | P0 | 已實作 | tw-meme-generator |
+| FR-005 | FB／LINE 尺寸 | P1 | 未實作 | 需求來自 taiwan-meme-generator PRD |
+| FR-006 | OCR | P1 | 已實作 | tw-meme-generator |
+| FR-007 | Brand Kit | P1 | 已實作 | tw-meme-generator |
+| FR-008 | 收藏 | P1 | 已實作 | tw-meme-generator |
+| FR-009 | 分享 | P1 | 部分 | tw-meme-generator |
+| FR-010 | 熱門排行 | P2 | 部分 | tw-meme-generator |
+| FR-011 | 梗文案建議 | P2 | 部分 | tw-meme-generator |
+| FR-012 | 時事雷達 | P2 | 部分 | tw-meme-generator |
+| FR-013 | 台灣梗主題庫 | P2 | 已實作 | tw-meme-generator |
+| FR-014 | 素材授權標示 | P0 | 未實作 | — |
+| FR-015 | 檢舉下架 | P1 | 未實作 | — |
+| FR-016 | 校園自製範本 | P2 | 未實作 | 需求來自 taiwan-meme-generator PRD |
+
+## Deterministic checks
+
+本次未在本機執行（環境無 node）。最近 CI：2026-09-28 run `36497181080` — lint（tsc）／test／build ✓，Vercel deploy ✗。
+
+## 本次變更
+
+- 改寫 `PRD/SPEC.md`、`STATUS.md`；新增 `GOAL.md`、`AGENTS.md`、`SOP.md`；未動程式、設定、測試、`DELIVERY-REPORT.md`、`PRD/CHANGELOG.md`；未寫入 `taiwan-meme-generator`。
+
+## 待決事項
+
+1. 是否暫緩，或以 M1 收斂為合法免費小工具。
+2. 素材策略（自製／CC0／只靠上傳）。
+3. `taiwan-meme-generator` 是否封存。
+4. 舊 production URL 是否仍公開含真人與受保護角色名稱的項目。
