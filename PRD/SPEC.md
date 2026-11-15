@@ -1,201 +1,149 @@
-# tw-meme-generator · PRD v3.0.2 等級規格書
+# 台灣梗圖產生器（tw-meme-generator）— 產品需求規格 v4.0
 
-> 自動生成：2026-09-06（Sean 10-repo-fleet Batch 6B）
-> 對齊 SPEC v3.0 契約（SPEC §1–§19 全部套用）
-> 前置：v2.2.2 sweet spot 銳化版（2026-07-19，Sophia CPO）+ v3.0 sprint（2026-07-19）
+> 版本：v4.0（評估與 PRD 重建）｜更新日期：2026-11-16｜狀態：文件重建，**建議暫緩**
+> 主 repo：`openclawsean024-create/tw-meme-generator`（預設分支 `master`，重建基準 commit `40b4508`）
+> 候選併入 repo：`openclawsean024-create/taiwan-meme-generator`（`main`，commit `2494fc1`，只讀；只有 PRD 與 fleet 狀態頁，無產品程式）
+> 取代：v3.0.2（2026-09-06）。舊版 FR 全標「✅ shipped」與程式不符（見 §11）；舊版可由 git 歷史查閱。
 
----
-
-## 1. 產品概述
-
-### 1.1 問題陳述
-繁中 Threads / IG / LINE / FB 群組創作者每天產 1-3 張梗圖。最大痛點不是「做圖」而是「**找商用安全圖 + 配繁中梗文案 + 一鍵 9:16 / 1:1 直出**」——三件事目前要拆成三個工具（Imgflip 英文 / Canva 通用 / Figma 設計工具），沒有一站到位。台灣本地的梗文化（夜市、機車、便利商店、小吃、政治迷因、家庭語錄）也沒有結構化資料庫。
-
-### 1.2 目標使用者
-| Persona | 工作情境 | 主要任務 |
-|---|---|---|
-| Primary · 小琪（Threads 創作者） | 日 2 張，個人手機作業 | 找圖 + 配梗文案 + 直出 1:1 |
-| Secondary · 阿德（IG 限動小編） | 日 5 張，桌機作業 | 9:16 直出 + 商用安全 + 模板 |
-| Tertiary · Lisa（團隊小編） | 月 100 張 | 多人共用品牌套件 + 排程 |
-
-### 1.3 核心價值主張
-> **「繁中唯一 Threads / IG 梗圖工廠 — 商用圖 + AI 繁中梗文案 + 9:16 直出，10 秒做完一張。」**
-
-### 1.4 Non-Goals（明確不做）
-- ❌ 英文 / 日文 / 韓文梗素材（v1 繁中 only，鎖 niche）
-- ❌ 影音剪輯 / Reels 編輯（CapCut 紅海）
-- ❌ AI 圖像生成（Midjourney / DALL-E 紅海）
-- ❌ Scheduling 進階（Buffer / Later 紅海，僅做基本排程）
-- ❌ GIF 梗圖（Giphy 紅海）
+本文件的「已實作／部分／未實作」皆依 2026-11-16 閱讀 `master` 程式碼與 GitHub Actions 紀錄判斷。本機無法執行 node，**所有 lint／test／build 皆未在本機執行**。
 
 ---
 
-## 2. 使用者場景與流程
+## §0 評估結論
 
-### 2.1 使用者流程圖
-
-```mermaid
-flowchart LR
-  A[進入首頁] --> B[選主題/話題]
-  B --> C[選商用圖庫]
-  C --> D[加繁中文字]
-  D --> E[AI 梗文案]
-  E --> F[調整位置/字型]
-  F --> G{選尺寸}
-  G -->|1:1| H[Threads/IG 直出]
-  G -->|9:16| I[Reels 限動直出]
-  G -->|4:5| J[FB 貼文直出]
-  H --> K[下載 PNG]
-  I --> K
-  J --> K
-  K --> L{再次使用?}
-  L -->|是| B
-  L -->|否| M[結束]
-```
-
-### 2.2 主要場景
-
-| 場景 | 輸入 | 輸出 | 成功條件 |
-|---|---|---|---|
-| 個人單張產圖 | 主題關鍵字 + 選圖 + 加字 | PNG（1:1 / 9:16 / 4:5）| 10 秒內下載 |
-| 團隊品牌套件 | Logo + 字型 + 主色 | 自動套用到每張 | 一鍵套用，無需重設 |
-| 收藏管理 | 多張梗圖 | localStorage 收藏 | 跨 reload 保留 |
-
----
-
-## 3. 功能需求
-
-| FR | 名稱 | 優先級 | 狀態 |
-|---|---|---|---|
-| FR-001 | 32 個台灣文化梗資料庫（tw-topics） | P0 | ✅ shipped |
-| FR-002 | AI 繁中梗文案生成（rule-based + GPT-4o-mini ready） | P0 | ✅ shipped |
-| FR-003 | 1:1 / 9:16 / 4:5 多尺寸匯出（html-to-image） | P0 | ✅ shipped |
-| FR-004 | 文字區塊拖拉 / 縮放（react-rnd） | P0 | ✅ shipped |
-| FR-005 | 品牌套件 Brand Kit v2（字型/logo/colors/watermark） | P0 | ✅ shipped |
-| FR-006 | 收藏管理（localStorage） | P0 | ✅ shipped |
-| FR-007 | 編輯器單頁（/editor/[id]） | P0 | ✅ shipped |
-| FR-008 | 公開作品集（/gallery、/meme/[id]） | P0 | ✅ shipped |
-| FR-009 | 熱門時事雷達（Ptt/Dcard/Threads mock） | P1 | ✅ shipped |
-| FR-010 | 排名機制（rank.ts） | P1 | ✅ shipped |
-| FR-011 | Tesseract.js OCR 偵測（OcrDetector） | P1 | ✅ shipped |
-| FR-012 | framer-motion 動畫過場 | P2 | ✅ shipped |
-| FR-013 | 風格記憶（每位用戶 3 種最愛風格） | P2 | ⏳ planned |
-| FR-014 | 真實金流（Threads/IG API） | P2 | ⏳ planned |
-
----
-
-## 4. Non-Functional Requirements
-
-| 維度 | 需求 |
+| 項目 | 結論 |
 |---|---|
-| Performance | 首屏 LCP < 2.5s；單張匯出 < 5s |
-| Security | 無後端；純前端 SPA；無個資蒐集 |
-| Privacy | 所有資料 localStorage；無追蹤 |
-| Accessibility | WCAG 2.1 AA（文字對比 ≥ 4.5:1） |
-| Browser | Modern evergreen（Chrome / Edge / Safari / Firefox） |
-| Mobile | iOS Safari 15+ / Android Chrome 90+（手機直出） |
+| 現況完成度 | **50 / 100**。編輯器（拖曳／縮放文字框、替換與新增兩種模式）、Tesseract OCR 偵測文字位置、1:1／9:16／4:5 PNG 匯出、Brand Kit、收藏、Web Share／複製連結都有程式與測試（16 個測試檔）。但：**25 張梗圖全是 picsum.photos 隨機照片佔位**，沒有任何真正的梗圖素材；使用者**不能上傳自己的圖片**；「熱門排行」的分享與按讚數是寫死在 `rankings.json` 的假數字；「AI 梗文案」只有規則式函式且**沒有接到任何頁面**；「時事雷達」是依字串雜湊假造來源；分享連結依賴本機 localStorage，別人打開看不到。 |
+| 獲利潛力 | **低**。梗圖產生器普遍免費（Imgflip、Canva、各種 App，方案待確認），使用者付費意願低；最大的價值「熟悉的台灣梗圖」本身多半是影視截圖或名人照片，**無法合法授權商用**，能合法提供的自製／CC0 素材吸引力有限。 |
+| 目標客群（假設） | 在 LINE／FB 群組、Threads 發梗圖的一般使用者；品牌社群小編（需要 Brand Kit 浮水印）。 |
+| 獲利模式（假設） | 免費增值（小編方案：Brand Kit、無浮水印、批次匯出）；廣告收益待評估。 |
+| 主要風險 | ① **著作權**：素材清單以哆啦 A 夢、JoJo、皮卡丘、Rickroll 等受著作權保護的角色／作品命名，換成真圖即可能侵權（著作權法；合理使用範圍不確定，待法務確認）。② **肖像權與姓名權**：清單含藝人「歐陽娜娜」，`rankings.json` 有「娜娜出新歌啦」；以真人照片做梗圖並公開散布有肖像權、名譽風險（民法，待法務確認）。③ **假社群證明**：寫死的分享／按讚數以「熱門排行」呈現，可能被認為誤導。④ **政治梗**：`tw-topics` 含政治時事類，候選併入 repo 的 PRD 規劃「上傳候選人頭像」；涉及選舉期間的深度偽造與候選人肖像規範（公職人員選舉罷免法相關條文，待法務確認）。⑤ 平台條款：自動發布到 LINE／FB 不在範圍。 |
+| 建議 | **暫緩**。程式品質與測試基礎是本批最好的，但「合法素材」是此產品成立的前提，目前完全沒有；補齊素材（自製或 CC0）的成本與吸引力不成比例，獲利途徑薄弱。若 Sean 想保留為免費小工具，M1 只做「合法素材 + 使用者上傳 + 誠實資料」的收斂（見 `GOAL.md`），不投入付費功能。 |
+| 主 repo 選擇 | 同意以 `tw-meme-generator` 為主 repo：`taiwan-meme-generator` 沒有產品程式（只有 PRD、舊 SPEC、fleet 狀態頁 `dashboard.html`），且其 PRD 宣稱 FR-001～FR-009「✅ shipped」與實況不符。 |
+| 與其他產品重疊 | 本批 `remove-bg` 的去背能力可作為「上傳自己的照片」後續功能（需可商用模型）；`ugc-video-generator` 同屬社群素材工具。第一批 10 個產品清單本 brief 未提供，重疊情形待確認。 |
 
 ---
 
-## 5. 技術架構
+## 1. 問題
 
-```
-┌─────────────────────────────────────────┐
-│ Browser                                  │
-│  ┌──────────────────────────────────┐   │
-│  │ Next.js 16 App Router (Turbopack)│   │
-│  │  ├─ / (home)                     │   │
-│  │  ├─ /editor/[id]                 │   │
-│  │  ├─ /gallery                     │   │
-│  │  └─ /meme/[id]                   │   │
-│  └──────────────────────────────────┘   │
-│  ┌──────────────────────────────────┐   │
-│  │ Components                       │   │
-│  │  ├─ MemeCanvas                   │   │
-│  │  ├─ TextRegion (react-rnd)       │   │
-│  │  ├─ OcrDetector (tesseract.js)   │   │
-│  │  ├─ RankList                     │   │
-│  │  └─ ShareCard                    │   │
-│  └──────────────────────────────────┘   │
-│  ┌──────────────────────────────────┐   │
-│  │ lib/                             │   │
-│  │  ├─ ai-caption    ├─ trending    │   │
-│  │  ├─ brand-kit     ├─ favorites   │   │
-│  │  ├─ export-sizes  ├─ storage     │   │
-│  │  ├─ rank          ├─ ocr         │   │
-│  │  └─ data/tw-topics (32 個)       │   │
-│  └──────────────────────────────────┘   │
-│  ┌──────────────────────────────────┐   │
-│  │ localStorage                     │   │
-│  │  ├─ twm:favorites                │   │
-│  │  ├─ twm:brand-kit                │   │
-│  │  └─ twm:style-memory             │   │
-│  └──────────────────────────────────┘   │
-└─────────────────────────────────────────┘
-            │
-            │ HTTPS（靜態）
-            ▼
-    Vercel CDN / space.minimax.io
-```
+台灣 LINE／FB 群組與 Threads 使用者想快速做出帶繁中字的梗圖；國際工具素材以英文梗為主、字型與排版不適合直式中文。問題真實但多數人以免費工具或手機修圖解決，付費痛點**未經驗證**。
 
-### 5.1 Module Map
-- `src/app/` — Next.js 16 App Router（home / editor / gallery / meme）
-- `src/components/` — MemeCanvas / TextRegion / OcrDetector / RankList / ShareCard
-- `src/lib/` — ai-caption / trending / brand-kit / export-sizes / favorites / rank / storage / ocr
-- `src/data/tw-topics.ts` — 32 個台灣文化梗資料庫
-- `tests/` — Vitest 單元測試（8 files / 63 tests）
-- `.github/workflows/` — GHA CI/CD
+## 2. 目標客群
 
-### 5.2 環境變數
-- 無（純前端 / 離線優先）
-- 商用圖源：picsum.photos / i.imgur.com / raw.githubusercontent.com（白名單）
-
-### 5.3 降級策略
-- API 失敗 → 顯示本地快取 / 友善錯誤
-- 離線模式 → localStorage 持久化草稿
-- Tesseract.js OCR 失敗 → fallback 手動輸入
-
----
-
-## 6. Definition of Done
-
-- [x] 功能 P0 全部實作
-- [x] 單元測試覆蓋率 ≥ 60% 核心邏輯（63 tests / 8 files）
-- [x] `npm run build` 綠（54 static pages）
-- [x] `npm run lint` 0 error（tsc --noEmit）
-- [x] GHA CI 跑 4 jobs（lint / test / build / deploy）全綠
-- [x] README/STATUS 反映現況
-- [x] Deploy to Vercel production ✅ https://tw-meme-generator.vercel.app
-
----
-
-## 7. 部署契約
-
-| 環境 | 目標 | 觸發 |
+| 角色 | 描述 | 驗證狀態 |
 |---|---|---|
-| Production | Vercel | push to master |
-| Preview | Per-PR | PR opened |
+| 一般群組使用者 | 手機上 30 秒做一張圖 | 未驗證 |
+| 品牌社群小編 | 需要統一字型、Logo、浮水印 | 未驗證 |
 
-### 7.1 GHA Workflow
-- `.github/workflows/ci.yml`
-- jobs: lint / test / build / deploy
-- deploy: `vercel`
+## 3. 競品與差異
 
-### 7.2 環境變數
-- 無需 server-side secret
-- BYOK（GPT-4o-mini / Claude 3.5 API key）— 存 localStorage，不送 server
+| 競品 | 類型 | 備註 |
+|---|---|---|
+| Imgflip | 英文梗圖產生器 | 方案待確認 |
+| Canva | 通用設計 | 方案待確認 |
+| 手機內建編輯、各類梗圖 App | 免費替代 | 待確認 |
 
----
+差異化假設：繁中直式字、台灣常用尺寸、Brand Kit、OCR 自動定位文字框。是否足以吸引使用者待驗證。
 
-## 8. Out of Scope（不做的）
+## 4. 功能需求
 
-- 不做帳號系統（除非需求變更）
-- 不做付費牆（v1 純免費 + 廣告）
-- 不做原生 App（mobile web 已足）
-- 不做多語系（繁中 only）
+狀態：已實作／部分／未實作；所在 repo 預設為 `tw-meme-generator`，來自候選 repo 的需求標註「(taiwan-meme-generator PRD)」。
 
----
+| FR | 需求 | 優先 | 狀態 | 說明（以程式為準） |
+|---|---|---|---|---|
+| FR-001 | 編輯器：文字框拖曳、縮放、刪除、替換／新增模式 | P0 | 已實作 | `EditorClient`、`MemeCanvas`、`TextRegion`（react-rnd） |
+| FR-002 | 合法梗圖素材庫 | P0 | 未實作 | 25 張全為 picsum 佔位；名稱指向受保護角色與真人 |
+| FR-003 | 上傳自己的底圖 | P0 | 未實作 | 無上傳 UI（taiwan-meme-generator PRD FR-003 亦規劃） |
+| FR-004 | 多尺寸 PNG 匯出（1:1／9:16／4:5） | P0 | 已實作 | `export-sizes`、`ShareCard`（html-to-image），含文字溢出檢查 |
+| FR-005 | FB 1.91:1、LINE 尺寸 | P1 | 未實作 | (taiwan-meme-generator PRD FR-005) |
+| FR-006 | OCR 偵測原圖文字位置 | P1 | 已實作 | Tesseract.js `chi_tra+eng`，按需載入 |
+| FR-007 | Brand Kit（字型、色彩、Logo、浮水印） | P1 | 已實作 | localStorage 保存 |
+| FR-008 | 收藏 | P1 | 已實作 | `/favorites`，localStorage |
+| FR-009 | 分享（Web Share／複製連結） | P1 | 部分 | 連結內容只存在分享者本機 localStorage，他人開啟看不到 |
+| FR-010 | 熱門排行 | P2 | 部分 | `rankings.json` 寫死假數字；`rank.ts` 演算法有測試 |
+| FR-011 | 繁中梗文案建議 | P2 | 部分 | `ai-caption.ts` 規則式 + 髒話過濾，有測試，**未接到 UI** |
+| FR-012 | 時事雷達 | P2 | 部分 | `trending.ts` 以雜湊假造 Ptt／Dcard／Threads 來源 |
+| FR-013 | 台灣梗主題庫（32 則） | P2 | 已實作 | `tw-topics.ts`，含政治時事類 |
+| FR-014 | 素材來源與授權標示 | P0 | 未實作 | 每張素材需記錄來源、授權、作者 |
+| FR-015 | 檢舉與下架 | P1 | 未實作 | — |
+| FR-016 | 校園主題範本（自製） | P2 | 未實作 | (taiwan-meme-generator PRD FR-008 改為自製素材) |
 
-## 9. 變更日誌
+小計：已實作 6、部分 4、未實作 6。
 
-見 [`PRD/CHANGELOG.md`](PRD/CHANGELOG.md)
+## 5. 非功能需求
+
+- 手機寬 360px 可完成編輯與匯出；首頁 LCP < 2.5 秒（4G）。
+- OCR 模型（約 10 MB）只在使用者按下時載入。
+- 純前端；使用者上傳的圖片不離開瀏覽器。
+
+## 6. 資料與個資處理
+
+- 目前不收集帳號或個資；收藏、Brand Kit、分享紀錄存在使用者本機 localStorage。
+- 使用者上傳圖片（M1）只在瀏覽器處理，不上傳伺服器。
+- `rankings.json` 的「creator」為虛構暱稱；M1 移除假數據。
+
+## 7. 法規與風險
+
+| 風險 | 說明 | 對策 |
+|---|---|---|
+| 著作權 | 影視、動漫截圖與角色 | 素材只收自製、CC0／公眾領域或取得授權者，並記錄來源；移除以受保護角色命名的項目 |
+| 肖像權、姓名權 | 藝人與一般人照片 | 預載素材不得含可辨識真人；使用者上傳時提示需取得當事人同意 |
+| 選舉相關 | 政治梗、候選人頭像 | 不提供候選人素材包；時事主題不含特定政黨或人物（待法務確認選罷法） |
+| 誤導性數據 | 假排行數字 | 移除或明確標示「示範資料」 |
+| 不當內容 | 仇恨、霸凌字眼 | 沿用並擴充 `ai-caption` 的過濾詞表；提供檢舉 |
+
+## 8. 里程碑
+
+| 里程碑 | 內容 |
+|---|---|
+| **M1** 合法可用的免費小工具 | 品質閘門、移除風險素材與假數據、素材授權清單、使用者上傳、梗文案接 UI、分享改為圖片分享 |
+| M2 | 20 張自製／CC0 素材上線；10 位使用者試用；FB／LINE 尺寸 |
+| M3 | 依試用結果決定是否做小編方案（免費增值） |
+
+## 9. 成功指標
+
+- M1：AC 全通過；`src/data` 中每張素材都有授權紀錄。
+- M2：試用者兩週內再次使用 ≥ 40%。
+
+## 10. 合併清單（taiwan-meme-generator → tw-meme-generator）
+
+`taiwan-meme-generator` 只有文件（`PRD/SPEC.md` v3.0.2、`PRD/CHANGELOG.md`、根目錄 `SPEC.md` v2.2.1）、fleet 狀態頁 `dashboard.html` 與 GitHub Pages workflow，沒有可搬的程式。
+
+| 項目 | 搬／不搬 | 原因 |
+|---|---|---|
+| 「上傳自製底圖」需求（其 FR-003、US-003 的上傳部分） | **搬**（→ FR-003，M1） | 是合法素材問題的主要解法 |
+| 多平台尺寸：FB 1.91:1、LINE（其 FR-005、US-005） | **搬**（→ FR-005，M2） | 補足主 repo 缺的尺寸 |
+| Non-Goal「不做原創繪圖、僅用 CC0 + 公領域」 | **搬**（→ §7 素材原則） | 與本版法規對策一致 |
+| Non-Goal「不做 IG／LINE 直接發布」 | **搬**（→ Out of scope） | 平台條款風險 |
+| 校園模板包（其 FR-008、US-004） | **搬，改為自製素材**（→ FR-016，P2） | 不得用學校校徽或師生照片 |
+| AI 自動產梗（其 FR-004，BYOK 外部 API） | **不搬** | 需付費 API；主 repo 已有規則式 `ai-caption`，M1 先接 UI |
+| 政治梗模板包、上傳候選人頭像（其 FR-007、US-003） | **不搬** | 選舉法規、肖像權與平台政策風險高 |
+| 「500+ 在地模板」與 FR-001～FR-009「✅ shipped」 | **不搬** | 與實況不符，該 repo 無任何模板或程式 |
+| 市場規模、願付價格、商業化評分 82 | **不搬** | 無出處的內部估計 |
+| `dashboard.html`、GitHub Pages workflow | **不搬** | fleet 狀態頁，非產品 |
+
+合併後建議 Sean 決定是否封存 `taiwan-meme-generator`（本次不動）。
+
+## 11. README 與程式不符清單
+
+repo 沒有 README；以下比對 `STATUS.md`（舊）、`DELIVERY-REPORT.md`、舊 `PRD/SPEC.md` 與程式：
+
+| 文件說法 | 程式實況 |
+|---|---|
+| 舊 SPEC FR-002：「AI 繁中梗文案生成 ✅ shipped」 | `ai-caption.ts` 只被測試引用，沒有任何頁面使用 |
+| 舊 SPEC FR-009：「熱門時事雷達 ✅」 | 來源以字串雜湊指定，非真實資料 |
+| 舊 SPEC 價值主張：「商用安全圖」 | 全部是 picsum 隨機照片；名稱指向受保護作品與真人 |
+| DELIVERY-REPORT：「預載 25 個台灣經典梗圖」 | 只有名稱，圖片為佔位 |
+| 舊 SPEC FR-014：「真實金流（Threads/IG API）」 | 名稱混淆，無任何金流或平台 API 程式 |
+| 舊 `STATUS.md`：「63 tests」「8 test files」 | 目前 16 個測試檔（以 `it(`／`test(` 計約 160 個案例，未在本機執行） |
+| 舊 `STATUS.md`／DELIVERY-REPORT：多個不同 production URL | 本次未驗證任何 URL；最近一次 CI（2026-09-28）Vercel deploy 失敗 |
+| `package.json` `lint` = `tsc --noEmit` | 實際是型別檢查，沒有 ESLint |
+| 同時存在 `package-lock.json`、`pnpm-lock.yaml`、`pnpm-workspace.yaml` | CI 用 npm |
+
+## 12. 待決事項
+
+1. 是否同意暫緩；或以 M1 收斂為合法免費小工具。
+2. 素材策略：自製（誰畫）、CC0 來源、或只靠使用者上傳。
+3. `taiwan-meme-generator` 是否封存（不刪除）。
+4. 舊 production URL 目前是否公開，以及是否立即移除「歐陽娜娜」等真人與受保護角色項目（屬程式變更，本 PR 不動）。
+5. `feat/meme-generator-ui-milestone` 分支已透過 PR #1 合併（squash），可否刪除。
